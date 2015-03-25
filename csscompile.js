@@ -34,100 +34,80 @@ function className(i){
 
 module.exports.className = className;
 
-
+/*
+  compiles css. the styles arguments is an array of arrays.
+  each member of that array represents an element, and each
+  member of those arrays is a style that has been assigned
+  to that element.
+*/
 function compileCSS(styles){
+  //el is shorthand for element
 
-  //create a set of all styles. this gets rid of duplicates
-  var styleSet = {};
+  //create a mapping that, for each style, maps that style
+  //to to every element it occurs in 
+  var styleToEl = {};
   for(var i = 0; i < styles.length; i++){
     for (var j = 0; j < styles[i].length; j++){
-      styleSet[styles[i][j]] = true;
+      styleToEl[styles[i][j]] = [];
     }
   }
-
-  //turn the set into an ordered list
-  var styleList = Object.keys(styleSet);
-
-  //index the styles of each element
-  var hashes = [];
   for(var i = 0; i < styles.length; i++){
-    var hash = {};
-    for(var j = 0; j < styles[i].length; j++){
-      hash[styles[i][j]] = true;
+    for (var j = 0; j < styles[i].length; j++){
+      styleToEl[styles[i][j]].push(i);
     }
-    hashes.push(hash);
   }
 
-   /*
-     For every pair of styles, determine if there is at least one element in which one of styles occurs and the other doesn't.
-     If there is no such element, match those styles. create a set of partitions of collectively matched styles
-   */
+  //create a mapping from each possible set of elements to
+  //all the styles that occur in each of those elements and
+  //only in each of those elements
+  var elListToStyle = {};
+  var keys = Object.keys(styleToEl);
+  for(var i = 0; i < keys.length; i++){
+    elListToStyle[styleToEl[keys[i]].join()] = [styleToEl[keys[i]], []];
+  }
+  for(var i = 0; i < keys.length; i++){
+    elListToStyle[styleToEl[keys[i]].join()][1].push(keys[i]);
+  }
 
-   var partitions = [];
+  var keys = Object.keys(elListToStyle);
+  var partition = [];
+  for(var i = 0; i < keys.length; i++){
+    partition.push(elListToStyle[keys[i]]);
+  }
 
-   var matched = [];
-   for(var i = 0; i < styleList.length; i++){
-     matched.push(false);
-   }
+  //partition represents a partition of the set of all styles
+  //into sets of mutually occuring styles. No style in a set will ever
+  //appear in an element without every other style in that set also
+  //appearing in that element.
+  //
+  //Each two element array in partition represents a set of the partiion. 
+  //The first element of each of these is an array of indices to elements in 
+  //which the set belongs, and the second element is an array of the styles
+  //that make up that set.
 
-   for(var i = 0; i < styleList.length; i++){
-     if(!matched[i]){
-       var partition = [i];
-       for(var j = i + 1; j < styleList.length; j++){
-         var match = true;
-         for(var k = 0; k < hashes.length; k++){
-           var first = (styleList[i] in hashes[k]);
-           var second = (styleList[j] in hashes[k]);
-           if(first !== second){
-             match = false;
-             break;
-           }
-         }
-         if(match){
-           partition.push(j);
-           matched[j] = true;
-         }
-       }
-       partitions.push(partition);
-     }
-   }
+  //asign a class name to each partition as the third element of each set
+  for(var i = 0; i < partition.length; i++){
+    partition[i].push(className(i));
+  }
 
-   //asign a class name to each partition
-   var classes = [];
+  //create a mapping from each element to all the class names it should have
+  var elToClass = [];
+  for(var i = 0; i < styles.length; i++){
+    elToClass.push([]);
+  }
+  for(var i = 0; i < partition.length; i++){
+    for(var j = 0; j < partition[i][0].length; j++){
+      elToClass[partition[i][0][j]].push(partition[i][2]);
+    }
+  }
 
-   for(var i = 0; i < partitions.length; i++){
-     classes[i] = className(i);
-   }
+  //create a mapping from each class to all the styles it contains
+  var classToStyle = {};
+  for(var i = 0; i < partition.length; i++){
+    classToStyle[partition[i][2]] = partition[i][1]; 
+  }
 
-   //map styles to partitions
-   var styleMap = {};
-   for(var i = 0; i < partitions.length; i++){
-     for(var j = 0; j < partitions[i].length; j++){
-       styleMap[styleList[partitions[i][j]]] = i;
-     }
-   }
-
-   var classMap = {};
-   for(var i = 0; i < partitions.length; i++){
-     var s = [];
-     for(var j = 0; j < partitions[i].length; j++){
-       s.push(styleList[partitions[i][j]]);
-     }
-     classMap[classes[i]] = s;
-   }   
-
-   var cAssignments = [];
-   for(var i = 0; i < styles.length; i++){
-     var elClasses = {};
-     for(var j = 0; j < styles[i].length; j++){
-       var partition = styleMap[styles[i][j]]
-       var cls = classes[partition];
-       elClasses[cls] = true;
-     }
-     cAssignments.push(Object.keys(elClasses));
-   }
-
-   return { "elToClass" : cAssignments, "classToStyle" : classMap };
+  return { "elToClass" : elToClass, "classToStyle" : classToStyle };
 
 }
 
