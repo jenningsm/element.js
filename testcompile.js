@@ -28,8 +28,9 @@ function testNames(){
 
 
 function testCompile(){
-  var test = [["a", "b"], ["a", "b"], ["a", "c", "b"]];
+  var test = [[], ["a", "b"], ["a", "b"], ["a", "c", "b", "d", "e", "f"], ["a", "c", "b", "d", "e"], ["d"]];
   var a = compile.compile(test);
+  console.log(test);
   console.log(a["elToClass"]);
   console.log(createStyleSheet(a["classToStyle"]));
 }
