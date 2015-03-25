@@ -26,5 +26,26 @@ function testNames(){
   console.log("Tested first " + Object.keys(names).length);
 }
 
-testNames();
 
+function testCompile(){
+  var test = [["a", "b"], ["a", "b"], ["a", "c", "b"]];
+  var a = compile.compile(test);
+  console.log(a["elToClass"]);
+  console.log(createStyleSheet(a["classToStyle"]));
+}
+
+testCompile();
+
+function createStyleSheet(classes){
+  var stylesheet = '';
+  for(cls in classes){
+    if(classes.hasOwnProperty(cls)){
+      stylesheet += '.' + cls + '{\n';
+      for(var j = 0; j < classes[cls].length; j++){
+        stylesheet += "  " + classes[cls][j] + ';\n';
+      }
+      stylesheet += '}\n';
+    }
+  }
+  return stylesheet;
+} 

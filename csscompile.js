@@ -34,6 +34,7 @@ function className(i){
 
 module.exports.className = className;
 
+
 function compileCSS(styles){
 
   //create a set of all styles. this gets rid of duplicates
@@ -45,7 +46,7 @@ function compileCSS(styles){
   }
 
   //turn the set into an ordered list
-  var styleList = styleSet.keys();
+  var styleList = Object.keys(styleSet);
 
   //index the styles of each element
   var hashes = [];
@@ -91,6 +92,43 @@ function compileCSS(styles){
      }
    }
 
-   
+   //asign a class name to each partition
+   var classes = [];
+
+   for(var i = 0; i < partitions.length; i++){
+     classes[i] = className(i);
+   }
+
+   //map styles to partitions
+   var styleMap = {};
+   for(var i = 0; i < partitions.length; i++){
+     for(var j = 0; j < partitions[i].length; j++){
+       styleMap[styleList[partitions[i][j]]] = i;
+     }
+   }
+
+   var classMap = {};
+   for(var i = 0; i < partitions.length; i++){
+     var s = [];
+     for(var j = 0; j < partitions[i].length; j++){
+       s.push(styleList[partitions[i][j]]);
+     }
+     classMap[classes[i]] = s;
+   }   
+
+   var cAssignments = [];
+   for(var i = 0; i < styles.length; i++){
+     var elClasses = {};
+     for(var j = 0; j < styles[i].length; j++){
+       var partition = styleMap[styles[i][j]]
+       var cls = classes[partition];
+       elClasses[cls] = true;
+     }
+     cAssignments.push(Object.keys(elClasses));
+   }
+
+   return { "elToClass" : cAssignments, "classToStyle" : classMap };
 
 }
+
+module.exports.compile = compileCSS;
