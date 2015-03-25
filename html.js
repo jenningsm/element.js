@@ -1,32 +1,37 @@
 
-function checkAttributes(attributes, value){
+//TODO: create actual html, insert ids at request of javascript code
+
+
+function checkAttribute(attribute){
+  if(attribute === 'class'){
+    console.error("ERROR: You may not set the class property of an element");
+    return -1;
+  }
+  if(attribute === 'style'){
+    console.warn("WARNING: Are you sure you want to set the style attribute?");
+    return 1;
+  }
+  return 0;
+}
+
+function checkAttributes(attributes){
+  var c = 0;
   if(Array.isArray(attributes[0])){
     for(var i = 0; i < attributes.length; i++){
-      if(attributes[i][0] === 'class'){
-        console.error("ERROR: You may not set the class property of an element");
+      c = checkAttribute(attributes[i][0]);
+      if(c === -1){
         return -1;
-      }
-      if(attributes[i][0] === 'style'){
-        console.warn("WARNING: Are you sure you want to set the style attribute?");
-        return 1;
       }
     }
   } else {
     
-    if(!Array.isArray(attribute)){
-      attributes = [attributes, value];
-    }
-
-    if(attributes[0] === 'class'){
-      console.error("ERROR: You may not set the class property of an element");
-      return -1;
-    }
-    if(attributes[0] === 'style'){
-      console.warn("WARNING: Are you sure you want to set the style attribute?");
-      return 1;
+    if(!Array.isArray(attributes)){
+      c = checkAttribute(attributes);
+    } else {
+      c = checkAttribute(attributes[0]);
     }
   }
-  return 0;
+  return c;
 }
 
 /*
@@ -89,7 +94,7 @@ function style(element, style, value){
 // used the same way as style, except for attributes instead of styles
 function attribute(element, attribute, value){
 
-  if(checkAttributes(attribute, value) === -1){
+  if(checkAttributes(attribute) === -1){
     return;
   }
 
