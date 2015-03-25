@@ -1,5 +1,44 @@
 
+var startchars = 26;
+var numchars = 36;
+function className(i){
+  for(var length = 2; i >= startchars * Math.pow(numchars, length-1); length++){
+    i -= startchars * Math.pow(numchars, length-1);
+  }
 
+  var chars = [];
+
+  chars.push(Math.floor(i % startchars));
+  i /= startchars;
+  length--;
+
+  while (length > 0){
+    chars.push(Math.floor(i % numchars));
+    i /= numchars;
+    length--;
+  } 
+
+  if(chars.length === 1){
+    chars.push(0);
+  }
+  
+  var name = '';
+  var a = 'a'.charCodeAt(0);
+  var zero = '0'.charCodeAt(0);
+  for(var j = 0; j < chars.length; j++){
+    if(chars[j] < startchars){
+      name += String.fromCharCode(a + chars[j]);
+    } else {
+      name += String.fromCharCode(zero + chars[j] - startchars);
+    }
+  }
+
+  return name;
+}
+
+function testName(i){
+  console.log(i, className(i));
+}
 
 function compileCSS(styles){
 
