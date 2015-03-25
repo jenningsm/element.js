@@ -1,7 +1,7 @@
 
 var startchars = 26;
 var numchars = 36;
-function className(i){
+function selectorName(i){
   for(var length = 2; i >= startchars * Math.pow(numchars, length-1); length++){
     i -= startchars * Math.pow(numchars, length-1);
   }
@@ -32,7 +32,7 @@ function className(i){
   return name;
 }
 
-module.exports.className = className;
+module.exports.selectorName = selectorName;
 
 /*
   compiles css. the styles arguments is an array of arrays.
@@ -87,7 +87,7 @@ function compileCSS(styles){
 
   //asign a class name to each partition as the third element of each set
   for(var i = 0; i < partition.length; i++){
-    partition[i].push(className(i));
+    partition[i].push(selectorName(i));
   }
 
   //create a mapping from each element to all the class names it should have

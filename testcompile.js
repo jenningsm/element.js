@@ -2,14 +2,14 @@
 var compile = require('./csscompile');
 
 function testName(i){
-  console.log(i, compile.className(i));
+  console.log(i, compile.selectorName(i));
 }
 
 function testNames(){
   var names = {};
   var failed = false;
   for(var i = 0; i < 10000; i++){
-    var name = compile.className(i);
+    var name = compile.selectorName(i);
     if(name in names || name.length < 2 || name.charCodeAt(0) < 'a'.charCodeAt(0) || name.charCodeAt(0) > 'z'.charCodeAt(0)){
       failed = true;
       var message = (name in names ? "repeat" : "failure");
