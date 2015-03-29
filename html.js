@@ -1,70 +1,61 @@
 
 var cs = require('./cssify.js');
 
-function createHTML(element){
-  var open = "<" + element.tag;
-  if(element.classes !== undefined){
-    element.attributes['class'] = element.classes;
-  }
-  var akeys = Object.keys(element.attributes);
-  for(var i = 0; i < akeys.length; i++){
-    open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
-  }
-  open += ">\n";
- 
-  var content = '';
-  for(var i = 0; i < element.content.length; i++){
-    if(typeof element.content[i] === 'string'){
-      open += element.content[i] + "\n";
-    } else {
-      open += createHTML(element.content[i]) + "\n";
-    }
-  }
-
-  var close = "</" + element.tag + ">";
-
-  return open + content + close;
-}
-
-function generate(root){
-  var ssheet = cs.cssify(root);
-  var html = createHTML(root);
-
-  return {'html' : html, 'css' : ssheet};
-}
-
-module.exports.generate = generate;
-
 /*
   tag: the tag of the element
   attributes: the attributes for the tag. either a dictionary of attribute value pairs, or a string representing an attribute.
   value: only defined if attributes is a string. if defined, is the value for the attribute
 */
 function element(tag, attributes, value){
-  var el = {};
-  el.tag = tag;
-  el.styles = {};
-  el.content = [];
-
+  this.tag = tag;
+  this.styles = {};
+  this.content = [];
 
   if(attributes !== undefined){
     if(checkAttributes(attributes) === -1){
        return;
     }
-
     if(value === undefined){
-      el.attributes = attributes;
+      this.attributes = attributes;
     } else {
-      el.attributes = { attributes : value };
+      this.attributes = { attributes : value };
     }
   } else {
-    el.attributes = {};
+    this.attributes = {};
   }
-
-  return el;
 }
 
-module.exports.element = element;
+element.prototype.generate = function(){
+  var ssheet = cs.cssify(this);
+  var html = this.toHTML();
+
+  return {'html' : html, 'css' : ssheet};
+}
+
+element.prototype.toHTML = function(){
+  var open = "<" + this.tag;
+  if(this.classes !== undefined){
+    this.attributes['class'] = this.classes;
+  }
+  var akeys = Object.keys(this.attributes);
+  for(var i = 0; i < akeys.length; i++){
+    open += " " + akeys[i] + '="' + this.attributes[akeys[i]] + '"';
+  }
+  open += ">\n";
+ 
+  var content = '';
+  for(var i = 0; i < this.content.length; i++){
+    if(typeof this.content[i] === 'string'){
+      open += this.content[i] + "\n";
+    } else {
+      open += this.content[i].toHTML() + "\n";
+    }
+  }
+
+  var close = "</" + this.tag + ">";
+
+  return open + content + close;
+}
 
 /*
   set the style of an element. This function may be used in two ways:
@@ -75,22 +66,20 @@ module.exports.element = element;
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
 
 */
-function style(element, style, value){
+element.prototype.style = function(style, value){
   if(value === undefined){
     var keys = Object.keys(style);
     for(var i = 0; i < keys.length; i++){
-      element.styles[keys[i]] = style[keys[i]];
+      this.styles[keys[i]] = style[keys[i]];
     }
   } else {
-    element.styles[style] = value;
+    this.styles[style] = value;
   }
-  return element;
+  return this;
 }
 
-module.exports.style = style;
-
 // used the same way as style, except for attributes instead of styles
-function attribute(element, attribute, value){
+element.prototype.attribute = function(attribute, value){
 
   if(checkAttributes(attribute) === -1){
     return;
@@ -99,36 +88,30 @@ function attribute(element, attribute, value){
   if(value === undefined){
     var keys = Object.keys(attribute);
     for(var i = 0; i < keys.length; i++){
-      element.attributes[keys[i]] = attribute[keys[i]];
+      this.attributes[keys[i]] = attribute[keys[i]];
     }
   } else {
-    element.attributes[attribute] = value;
+    this.attributes[attribute] = value;
   }
-  return element;
+  return this;
 }
-
-module.exports.attribute = attribute;
 
 //append content to the end of element's content
-function appendContent(element, content){
-  element.content.push(content);
-  return element;
+element.prototype.appendContent = function(content){
+  this.content.push(content);
+  return this;
 }
-
-module.exports.appendContent = appendContent;
 
 //insert content. if no position is specified, insert at beginning, else
 //insert at position specified, or end if longer than length
-function insertContent(element, content, position){
+element.prototype.insertContent = function(content, position){
   if(position === undefined){
     position = 0;
   }
-  position = Math.min(position, element.content.length);
-  element.content.splice(position, 0, content);
-  return element;
+  position = Math.min(position, this.content.length);
+  this.content.splice(position, 0, content);
+  return this;
 }
-
-module.exports.insertContent = insertContent;
 
 function checkAttribute(attribute){
   if(attribute === 'class'){
@@ -158,3 +141,4 @@ function checkAttributes(attributes){
   return c;
 }
 
+module.exports = element;
