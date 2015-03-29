@@ -1,6 +1,122 @@
 
-//TODO: create actual html, insert ids at request of javascript code
+function createHTML(element){
+  var open = "<" + element.tag;
+  var akeys = Object.keys(element.attributes);
+  for(var i = 0; i < akeys.length; i++){
+    open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
+  }
+  open += ">\n";
+ 
+  var content = '';
+  for(var i = 0; i < element.content.length; i++){
+    if(typeof element.content[i] === 'string'){
+      open += element.content[i] + "\n";
+    } else {
+      open += createHTML(element.content[i]) + "\n";
+    }
+  }
 
+  var close = "</" + element.tag + ">";
+
+  return open + content + close;
+}
+
+module.exports.createHTML = createHTML;
+
+/*
+  tag: the tag of the element
+  attributes: the attributes for the tag. either a dictionary of attribute value pairs, or a string representing an attribute.
+  value: only defined if attributes is a string. if defined, is the value for the attribute
+*/
+function element(tag, attributes, value){
+  var el = {};
+  el.tag = tag;
+  el.styles = {};
+  el.content = [];
+
+
+  if(attributes !== undefined){
+    if(checkAttributes(attributes) === -1){
+       return;
+    }
+
+    if(value === undefined){
+      el.attributes = attributes;
+    } else {
+      el.attributes = { attributes : value };
+    }
+  } else {
+    el.attributes = {};
+  }
+
+  return el;
+}
+
+module.exports.element = element;
+
+/*
+  set the style of an element. This function may be used in two ways:
+
+    style may be a string, in which case it represents a particular style, and value, which must
+    also be a string, represents the value for that style
+
+    otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
+
+*/
+function style(element, style, value){
+  if(value === undefined){
+    var keys = Object.keys(style);
+    for(var i = 0; i < keys.length; i++){
+      element.styles[keys[i]] = style[keys[i]];
+    }
+  } else {
+    element.styles[style] = value;
+  }
+  return element;
+}
+
+module.exports.style = style;
+
+// used the same way as style, except for attributes instead of styles
+function attribute(element, attribute, value){
+
+  if(checkAttributes(attribute) === -1){
+    return;
+  }
+
+  if(value === undefined){
+    var keys = Object.keys(attribute);
+    for(var i = 0; i < keys.length; i++){
+      element.attributes[keys[i]] = attribute[keys[i]];
+    }
+  } else {
+    element.attributes[attribute] = value;
+  }
+  return element;
+}
+
+module.exports.attribute = attribute;
+
+//append content to the end of element's content
+function appendContent(element, content){
+  element.content.push(content);
+  return element;
+}
+
+module.exports.appendContent = appendContent;
+
+//insert content. if no position is specified, insert at beginning, else
+//insert at position specified, or end if longer than length
+function insertContent(element, content, position){
+  if(position === undefined){
+    position = 0;
+  }
+  position = Math.min(position, element.content.length);
+  element.content.splice(position, 0, content);
+  return element;
+}
+
+module.exports.insertContent = insertContent;
 
 function checkAttribute(attribute){
   if(attribute === 'class'){
@@ -16,113 +132,17 @@ function checkAttribute(attribute){
 
 function checkAttributes(attributes){
   var c = 0;
-  if(Array.isArray(attributes[0])){
-    for(var i = 0; i < attributes.length; i++){
-      c = checkAttribute(attributes[i][0]);
+  if(typeof attributes !== 'string'){
+    var keys = Object.keys(attributes);
+    for(var i = 0; i < keys.length; i++){
+      c = checkAttribute(keys[i]);
       if(c === -1){
         return -1;
       }
     }
   } else {
-    
-    if(!Array.isArray(attributes)){
-      c = checkAttribute(attributes);
-    } else {
-      c = checkAttribute(attributes[0]);
-    }
+    c = checkAttribute(attributes);
   }
   return c;
 }
 
-/*
-  tag: the tag of the element
-  attributes: an array of attribute-value pairs, in the form an array, or just a single attribute-value pair
-*/
-function element(tag, attributes){
-  var el = {};
-  el.tag = tag;
-  el.styles = [];
-  el.content = [];
-
-  if(checkAttributes(attributes) === -1){
-     return;
-  }
-
-  if(attributes !== undefined){
-    if(Array.isArray(attributes[0]){
-      el.attributes = attributes;
-    } else {
-      el.attributes = [attributes];
-    }
-  } else {
-    el.attributes = [];
-  }
-
-  return el;
-}
-
-/*
-  set the style of an element. This function may be used in three ways:
-
-    style may be an array of two element arrays, in which case the value parameter will be undefined.
-    Each of the top level arrays
-    is a style to apply, the first of the two elements within each of these arrays
-    is the particular style to apply (e.g. 'width', 'background'), and the second
-    is the value for that style (e.g. '20%', 'black')
-
-    style may be a two element array, in which case its two elements are the particular style
-    and its value. the value parameter will be undefined in this case
-
-    style may be a string, in which case it represents a particular style, and value, which will
-    also be a string, represents the value
-
-*/
-function style(element, style, value){
-  if(value === undefined){
-    if(Array.isArray(style[0])){
-       element.styles = element.styles.concat(style);
-    } else {
-       element.styles = element.styles.concat([style]);
-    }
-  } else {
-    element.styles = element.styles.concat([style, value]);
-  }
-  return element;
-}
-
-
-// used the same way as style, except for attributes instead of styles
-function attribute(element, attribute, value){
-
-  if(checkAttributes(attribute) === -1){
-    return;
-  }
-
-  if(value === undefined){
-    if(Array.isArray(style[0])){
-       element.attributes = element.styles.concat(attibute);
-    } else {
-       element.attributes = element.styles.concat([attribute]);
-    }
-  } else {
-    element.attributes = element.styles.concat([attribute, value]);
-  }
-  return element;
-}
-
-//append content to the end of element's content
-function appendContent(element, content){
-  element.content.push(content);
-  return element;
-}
-
-//insert content. if no position is specified, insert at beginning, else
-//insert at position specified, or end if longer than length
-function insertContent(element, content, position){
-  if(position === undefined){
-    position = 0;
-  }
-  position = Math.min(position, element.content.length);
-  element.content.splice(position, 0, content);
-  return element;
-}
