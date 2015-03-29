@@ -1,5 +1,5 @@
 
-var cs = require('./cssify.js');
+var cssify = require('./cssify.js');
 
 /*
   tag: the tag of the element
@@ -26,7 +26,7 @@ function element(tag, attributes, value){
 }
 
 element.prototype.generate = function(){
-  var ssheet = cs.cssify(this);
+  var ssheet = cssify(this);
   var html = this.toHTML();
 
   return {'html' : html, 'css' : ssheet};

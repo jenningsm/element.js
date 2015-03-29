@@ -70,4 +70,4 @@ function cssify(root){
   return createStyleSheet(a['styles']); 
 }
 
-module.exports.cssify = cssify;
+module.exports = cssify;
