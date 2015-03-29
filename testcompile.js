@@ -34,8 +34,8 @@ function testCompile(){
   var testingNow = t2;
   var a = compile.compile(testingNow);
   console.log(testingNow);
-  console.log(a["elToClass"]);
-  console.log(createStyleSheet(a["classToStyle"]));
+  console.log(a["elements"]);
+  console.log(createStyleSheet(a["styles"]));
 }
 
 testCompile();

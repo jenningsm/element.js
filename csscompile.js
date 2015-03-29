@@ -107,7 +107,7 @@ function compileCSS(styles){
     classToStyle[partition[i][2]] = partition[i][1]; 
   }
 
-  return { "elToClass" : elToClass, "classToStyle" : classToStyle };
+  return { "elements" : elToClass, "styles" : classToStyle };
 
 }
 
