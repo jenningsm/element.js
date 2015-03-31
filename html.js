@@ -10,6 +10,7 @@ function Element(tag, attributes, value){
   this.tag = tag;
   this.styles = {};
   this.contentData = [];
+  this.contentList = [];
   this.attributes = {};
 
   if(attributes !== undefined){
@@ -31,22 +32,6 @@ Element.prototype.generate = function(legible){
   return {'html' : html, 'css' : ssheet};
 }
 
-function flatten(arr){
-  if(!Array.isArray(arr)){
-    return [arr];
-  } else {
-    var ret = [];
-    for(var i = 0; i < arr.length; i++){
-      ret = ret.concat(flatten(arr[i]));
-    }
-    return ret;
-  }
-}
-
-Element.prototype.flatContent = function(){
-  return flatten(this.contentData);
-}
-
 Element.prototype.toHTML = function(spaces){
   var indent = (spaces === undefined ? '' : spaces);
   var open = indent + "<" + this.tag;
@@ -59,20 +44,60 @@ Element.prototype.toHTML = function(spaces){
   }
   open += ">\n";
  
-  var contentList = this.flatContent();
-
   var content = '';
-  for(var i = 0; i < contentList.length; i++){
-    if(typeof contentList[i] === 'string'){
-      content += '  ' + indent + contentList[i] + "\n";
+  for(var i = 0; i < this.contentList.length; i++){
+    if(typeof this.contentList[i] === 'string'){
+      content += '  ' + indent + this.contentList[i] + "\n";
     } else {
-      content += contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
+      content += this.contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
     }
   }
 
   var close = indent + "</" + this.tag + ">";
 
   return open + content + close;
+}
+
+//set the content of an element
+Element.prototype.content = function(){
+  var args = [];
+  for(var i = 0; i < arguments.length; i++){
+    args.push(arguments[i]);
+  }
+
+  this.contentData = this.contentData.concat(contentHelper(args));
+  this.contentList = flatten(this.contentData);
+  return this;
+}
+
+function contentHelper(content){
+  var ret;
+  if(Array.isArray(content)){
+    ret = [];
+    for(var i = 0; i < content.length; i++){
+      ret.push(contentHelper(content[i]));
+    }
+  } else if (typeof content === 'function') {
+    ret = [];
+    for(var i = 0, item; (item = content(i)) !== null; i++){
+      ret.push(item);
+    }
+  } else {
+    ret = content;
+  }
+  return ret;
+}
+
+function flatten(arr){
+  if(!Array.isArray(arr)){
+    return [arr];
+  } else {
+    var ret = [];
+    for(var i = 0; i < arr.length; i++){
+      ret = ret.concat(flatten(arr[i]));
+    }
+    return ret;
+  }
 }
 
 /*
@@ -113,52 +138,6 @@ Element.prototype.attribute = function(attribute, value){
   return this;
 }
 
-Element.prototype.content = function(){
-
-  var args = [];
-  for(var i = 0; i < arguments.length; i++){
-    args.push(arguments[i]);
-  }
-
-  this.contentData = this.contentData.concat(contentHelper(args));
-
-  return this;
-}
-
-function contentHelper(content){
-  var ret;
-  if(Array.isArray(content)){
-    ret = [];
-    for(var i = 0; i < content.length; i++){
-      ret.push(contentHelper(content[i]));
-    }
-  } else if (typeof content === 'function') {
-    ret = [];
-    for(var i = 0, item; (item = content(i)) !== null; i++){
-      ret.push(item);
-    }
-  } else {
-    ret = content;
-  }
-  return ret;
-}
-
-//append content to the end of element's content
-Element.prototype.appendContent = function(content){
-  this.contentData.push(content);
-  return this;
-}
-
-//insert content. if no position is specified, insert at beginning, else
-//insert at position specified, or end if longer than length
-Element.prototype.insertContent = function(content, position){
-  if(position === undefined){
-    position = 0;
-  }
-  position = Math.min(position, this.contentData.length);
-  this.contentData.splice(position, 0, content);
-  return this;
-}
 
 function checkAttribute(attribute){
   if(attribute === 'class'){

@@ -34,7 +34,7 @@ function iterator(root){
         nextgen = [];
       }
     }
-    var content = currgen[0].flatContent();
+    var content = currgen[0].contentList;
     for(var i = 0; i < content.length; i++){
       if(typeof content[i] !== 'string'){
         nextgen.push(content[i]);
