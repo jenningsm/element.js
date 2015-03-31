@@ -6,25 +6,20 @@ var cssify = require('./cssify.js');
   attributes: the attributes for the tag. either a dictionary of attribute value pairs, or a string representing an attribute.
   value: only defined if attributes is a string. if defined, is the value for the attribute
 */
-function Element(tag, prnt, attributes, value){
+function Element(tag, attributes, value){
   this.tag = tag;
   this.styles = {};
-  this.content = [];
+  this.contentData = [];
   this.attributes = {};
 
-  if(prnt !== undefined){
-    if(prnt !== null){
-      prnt.appendContent(this);
+  if(attributes !== undefined){
+    if(checkAttributes(attributes) === -1){
+       return;
     }
-    if(attributes !== undefined){
-      if(checkAttributes(attributes) === -1){
-         return;
-      }
-      if(value === undefined){
-        this.attributes = attributes;
-      } else {
-        this.attributes[attributes] = value;
-      }
+    if(value === undefined){
+      this.attributes = attributes;
+    } else {
+      this.attributes[attributes] = value;
     }
   }
 }
@@ -34,6 +29,22 @@ Element.prototype.generate = function(legible){
   var html = this.toHTML(legible === undefined ? legible : '');
 
   return {'html' : html, 'css' : ssheet};
+}
+
+function flatten(arr){
+  if(!Array.isArray(arr)){
+    return [arr];
+  } else {
+    var ret = [];
+    for(var i = 0; i < arr.length; i++){
+      ret = ret.concat(flatten(arr[i]));
+    }
+    return ret;
+  }
+}
+
+Element.prototype.flatContent = function(){
+  return flatten(this.contentData);
 }
 
 Element.prototype.toHTML = function(spaces){
@@ -48,23 +59,20 @@ Element.prototype.toHTML = function(spaces){
   }
   open += ">\n";
  
+  var contentList = this.flatContent();
+
   var content = '';
-  for(var i = 0; i < this.content.length; i++){
-    if(typeof this.content[i] === 'string'){
-      content += '  ' + indent + this.content[i] + "\n";
+  for(var i = 0; i < contentList.length; i++){
+    if(typeof contentList[i] === 'string'){
+      content += '  ' + indent + contentList[i] + "\n";
     } else {
-      content += this.content[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
+      content += contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
     }
   }
 
   var close = indent + "</" + this.tag + ">";
 
   return open + content + close;
-}
-
-Element.prototype.addParent = function(prnt){
-  prnt.appendContent(this);
-  return this;
 }
 
 /*
@@ -74,7 +82,6 @@ Element.prototype.addParent = function(prnt){
     also be a string, represents the value for that style
 
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
-
 */
 Element.prototype.style = function(style, value){
   if(value === undefined){
@@ -106,9 +113,39 @@ Element.prototype.attribute = function(attribute, value){
   return this;
 }
 
+Element.prototype.content = function(){
+
+  var args = [];
+  for(var i = 0; i < arguments.length; i++){
+    args.push(arguments[i]);
+  }
+
+  this.contentData = this.contentData.concat(contentHelper(args));
+
+  return this;
+}
+
+function contentHelper(content){
+  var ret;
+  if(Array.isArray(content)){
+    ret = [];
+    for(var i = 0; i < content.length; i++){
+      ret.push(contentHelper(content[i]));
+    }
+  } else if (typeof content === 'function') {
+    ret = [];
+    for(var i = 0, item; (item = content(i)) !== null; i++){
+      ret.push(item);
+    }
+  } else {
+    ret = content;
+  }
+  return ret;
+}
+
 //append content to the end of element's content
 Element.prototype.appendContent = function(content){
-  this.content.push(content);
+  this.contentData.push(content);
   return this;
 }
 
@@ -118,8 +155,8 @@ Element.prototype.insertContent = function(content, position){
   if(position === undefined){
     position = 0;
   }
-  position = Math.min(position, this.content.length);
-  this.content.splice(position, 0, content);
+  position = Math.min(position, this.contentData.length);
+  this.contentData.splice(position, 0, content);
   return this;
 }
 

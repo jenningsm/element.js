@@ -34,9 +34,10 @@ function iterator(root){
         nextgen = [];
       }
     }
-    for(var i = 0; i < currgen[0].content.length; i++){
-      if(typeof currgen[0].content[i] !== 'string'){
-        nextgen.push(currgen[0].content[i]);
+    var content = currgen[0].flatContent();
+    for(var i = 0; i < content.length; i++){
+      if(typeof content[i] !== 'string'){
+        nextgen.push(content[i]);
       }
     }
     return currgen.splice(0, 1)[0];
