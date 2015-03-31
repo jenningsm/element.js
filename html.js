@@ -6,7 +6,7 @@ var cssify = require('./cssify.js');
   attributes: the attributes for the tag. either a dictionary of attribute value pairs, or a string representing an attribute.
   value: only defined if attributes is a string. if defined, is the value for the attribute
 */
-function element(tag, attributes, value){
+function Element(tag, attributes, value){
   this.tag = tag;
   this.styles = {};
   this.content = [];
@@ -18,22 +18,24 @@ function element(tag, attributes, value){
     if(value === undefined){
       this.attributes = attributes;
     } else {
-      this.attributes = { attributes : value };
+      this.attributes = {};
+      this.attributes[attributes] = value;
     }
   } else {
     this.attributes = {};
   }
 }
 
-element.prototype.generate = function(){
+Element.prototype.generate = function(legible){
   var ssheet = cssify(this);
-  var html = this.toHTML();
+  var html = this.toHTML(legible === undefined ? legible : '');
 
   return {'html' : html, 'css' : ssheet};
 }
 
-element.prototype.toHTML = function(){
-  var open = "<" + this.tag;
+Element.prototype.toHTML = function(spaces){
+  var indent = (spaces === undefined ? '' : spaces);
+  var open = indent + "<" + this.tag;
   if(this.classes !== undefined){
     this.attributes['class'] = this.classes;
   }
@@ -46,13 +48,13 @@ element.prototype.toHTML = function(){
   var content = '';
   for(var i = 0; i < this.content.length; i++){
     if(typeof this.content[i] === 'string'){
-      open += this.content[i] + "\n";
+      content += '  ' + indent + this.content[i] + "\n";
     } else {
-      open += this.content[i].toHTML() + "\n";
+      content += this.content[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
     }
   }
 
-  var close = "</" + this.tag + ">";
+  var close = indent + "</" + this.tag + ">";
 
   return open + content + close;
 }
@@ -66,7 +68,7 @@ element.prototype.toHTML = function(){
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
 
 */
-element.prototype.style = function(style, value){
+Element.prototype.style = function(style, value){
   if(value === undefined){
     var keys = Object.keys(style);
     for(var i = 0; i < keys.length; i++){
@@ -79,7 +81,7 @@ element.prototype.style = function(style, value){
 }
 
 // used the same way as style, except for attributes instead of styles
-element.prototype.attribute = function(attribute, value){
+Element.prototype.attribute = function(attribute, value){
 
   if(checkAttributes(attribute) === -1){
     return;
@@ -97,14 +99,14 @@ element.prototype.attribute = function(attribute, value){
 }
 
 //append content to the end of element's content
-element.prototype.appendContent = function(content){
+Element.prototype.appendContent = function(content){
   this.content.push(content);
   return this;
 }
 
 //insert content. if no position is specified, insert at beginning, else
 //insert at position specified, or end if longer than length
-element.prototype.insertContent = function(content, position){
+Element.prototype.insertContent = function(content, position){
   if(position === undefined){
     position = 0;
   }
@@ -141,4 +143,4 @@ function checkAttributes(attributes){
   return c;
 }
 
-module.exports = element;
+module.exports = Element;
