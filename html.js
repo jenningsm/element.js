@@ -6,23 +6,26 @@ var cssify = require('./cssify.js');
   attributes: the attributes for the tag. either a dictionary of attribute value pairs, or a string representing an attribute.
   value: only defined if attributes is a string. if defined, is the value for the attribute
 */
-function Element(tag, attributes, value){
+function Element(tag, prnt, attributes, value){
   this.tag = tag;
   this.styles = {};
   this.content = [];
+  this.attributes = {};
 
-  if(attributes !== undefined){
-    if(checkAttributes(attributes) === -1){
-       return;
+  if(prnt !== undefined){
+    if(prnt !== null){
+      prnt.appendContent(this);
     }
-    if(value === undefined){
-      this.attributes = attributes;
-    } else {
-      this.attributes = {};
-      this.attributes[attributes] = value;
+    if(attributes !== undefined){
+      if(checkAttributes(attributes) === -1){
+         return;
+      }
+      if(value === undefined){
+        this.attributes = attributes;
+      } else {
+        this.attributes[attributes] = value;
+      }
     }
-  } else {
-    this.attributes = {};
   }
 }
 
@@ -57,6 +60,11 @@ Element.prototype.toHTML = function(spaces){
   var close = indent + "</" + this.tag + ">";
 
   return open + content + close;
+}
+
+Element.prototype.addParent = function(prnt){
+  prnt.appendContent(this);
+  return this;
 }
 
 /*
