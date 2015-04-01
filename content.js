@@ -16,7 +16,11 @@ function contentHelper(content){
   if(Array.isArray(content)){
     ret = [];
     for(var i = 0; i < content.length; i++){
-      ret = ret.concat(contentHelper(content[i]));
+      if(typeof content[i] === 'function'){
+        ret = ret.concat(contentHelper(content[i]));
+      } else {
+        ret.push(contentHelper(content[i]));
+      }
     }
   } else if (typeof content === 'function') {
     ret = [];
@@ -24,7 +28,7 @@ function contentHelper(content){
       ret.push(item);
     }
   } else {
-    ret = [content];
+    ret = content;
   }
   return ret;
 }
