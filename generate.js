@@ -11,7 +11,7 @@ function generate(shared, legible){
   while((i = iter()) !== null){
     i.applyChildStyles();
   }
-  var ssheet = cssify(this);
+  var ssheet = cssify(this, legible);
   var html = this.toHTML(legible === undefined ? legible : '');
 
   return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
@@ -54,6 +54,7 @@ function shareVars(shared){
 
 function toHTML(spaces){
   var indent = (spaces === undefined ? '' : spaces);
+  var newline = (spaces === undefined ? '' : '\n');
   var open = indent + "<" + this.tag;
   if(this.classes !== undefined){
     this.attributes['class'] = this.classes;
@@ -62,14 +63,14 @@ function toHTML(spaces){
   for(var i = 0; i < akeys.length; i++){
     open += " " + akeys[i] + '="' + this.attributes[akeys[i]] + '"';
   }
-  open += ">\n";
+  open += ">" + newline;
  
   var content = '';
   for(var i = 0; i < this.contentList.length; i++){
     if(typeof this.contentList[i] === 'string'){
-      content += '  ' + indent + this.contentList[i] + "\n";
+      content += (spaces === undefined ? '' : '  ') + indent + this.contentList[i] + newline;
     } else {
-      content += this.contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + "\n";
+      content += this.contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + newline;
     }
   }
 

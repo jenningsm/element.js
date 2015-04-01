@@ -1,15 +1,17 @@
 
 var cc = require('./csscompile');
 
-function createStyleSheet(classes){
+function createStyleSheet(classes, legible){
+  var newline = (legible === undefined ? '' : '\n');
+  var indent = (legible === undefined ? '' : '  ');
   var stylesheet = '';
   for(cls in classes){
     if(classes.hasOwnProperty(cls)){
-      stylesheet += '.' + cls + '{\n';
+      stylesheet += '.' + cls + '{' + newline;
       for(var j = 0; j < classes[cls].length; j++){
-        stylesheet += "  " + classes[cls][j] + ';\n';
+        stylesheet += indent + classes[cls][j] + ';' + newline;
       }
-      stylesheet += '}\n';
+      stylesheet += '}' + newline;
     }
   }
   return stylesheet;
@@ -22,7 +24,7 @@ function format(string){
    return string;
 }
 
-function cssify(root){
+function cssify(root, legible){
   var elements = [];
   var iter = root.iterator();
   var el;
@@ -46,7 +48,7 @@ function cssify(root){
     }
   }
 
-  return createStyleSheet(a['styles']); 
+  return createStyleSheet(a['styles'], legible); 
 }
 
 module.exports = cssify;
