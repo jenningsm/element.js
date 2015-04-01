@@ -22,31 +22,9 @@ function format(string){
    return string;
 }
 
-function iterator(root){
-  var currgen = [root];
-  var nextgen = [];
-  return function(){
-    if(currgen.length === 0){
-      if(nextgen.length === 0){
-        return null;
-      } else {
-        currgen = nextgen;
-        nextgen = [];
-      }
-    }
-    var content = currgen[0].contentList;
-    for(var i = 0; i < content.length; i++){
-      if(typeof content[i] !== 'string'){
-        nextgen.push(content[i]);
-      }
-    }
-    return currgen.splice(0, 1)[0];
-  }
-}
-
 function cssify(root){
   var elements = [];
-  var iter = iterator(root);
+  var iter = root.iterator();
   var el;
   while((el = iter()) !== null){
     var keys = Object.keys(el.styles);
@@ -60,7 +38,7 @@ function cssify(root){
   var a = cc.compile(elements);
 
   var classes = a['elements'];
-  var iter = iterator(root);
+  var iter = root.iterator();
   for(var i = 0; i < classes.length; i++){
     var el = iter();
     if(classes[i].length !== 0){
