@@ -1,7 +1,41 @@
 
 var cssify = require('./cssify.js');
+var selectorName = require('./csscompile.js').selectorName;
 
-function generate(legible){
+function generate(shared, legible){
+
+  var sharedVars = Object.keys(shared);
+  var sharedScript = 
+        'var pbr = function(){' +
+           'function get(id){' +
+              'return function(){' + 
+                 'return document.getElementById(id)' + 
+              '}' + 
+            '}\n' +
+            'return {';
+  var newids = 0;
+  for(var i = 0; i < sharedVars.length; i++){
+    if(shared[sharedVars[i]].constructor.name === this.constructor.name){
+      var id;
+      var el = shared[sharedVars[i]];
+      if(el.attributes.id !== undefined){
+        id = el.attributes.id;
+      } else {
+        id = selectorName(newids);
+        newids++;
+        el.attribute('id', id);
+      }
+      sharedScript += "'" + sharedVars[i] + "': get('" + id + "'),";
+    } else {
+      sharedScript += "'" + sharedVars[i] + "':'" + shared[sharedVars[i]].toString() + "',";
+    }
+  }
+  if(i > 0){
+    sharedScript = sharedScript.substring(0, sharedScript.length - 1) + '}}();';
+  } else {
+    sharedScript = '';
+  }
+
   var iter = this.iterator();
   var i;
   while((i = iter()) !== null){
@@ -10,7 +44,7 @@ function generate(legible){
   var ssheet = cssify(this);
   var html = this.toHTML(legible === undefined ? legible : '');
 
-  return {'html' : html, 'css' : ssheet};
+  return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
 }
 
 function toHTML(spaces){
