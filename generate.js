@@ -4,6 +4,20 @@ var selectorName = require('./csscompile.js').selectorName;
 
 function generate(shared, legible){
 
+  var sharedScript = this.shareVars(shared);
+
+  var iter = this.iterator();
+  var i;
+  while((i = iter()) !== null){
+    i.applyChildStyles();
+  }
+  var ssheet = cssify(this);
+  var html = this.toHTML(legible === undefined ? legible : '');
+
+  return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
+}
+
+function shareVars(shared){
   var sharedVars = Object.keys(shared);
   var sharedScript = 
         'var pbr = function(){' +
@@ -35,16 +49,7 @@ function generate(shared, legible){
   } else {
     sharedScript = '';
   }
-
-  var iter = this.iterator();
-  var i;
-  while((i = iter()) !== null){
-    i.applyChildStyles();
-  }
-  var ssheet = cssify(this);
-  var html = this.toHTML(legible === undefined ? legible : '');
-
-  return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
+  return sharedScript;
 }
 
 function toHTML(spaces){
@@ -75,3 +80,4 @@ function toHTML(spaces){
 
 module.exports.generate = generate;
 module.exports.toHTML = toHTML;
+module.exports.shareVars = shareVars;

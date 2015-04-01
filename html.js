@@ -48,6 +48,7 @@ Element.prototype.iterator = function (){
 var gen = require('./generate.js');
 Element.prototype.generate = gen.generate;
 Element.prototype.toHTML = gen.toHTML;
+Element.prototype.shareVars = gen.shareVars;
 
 Element.prototype.content = require('./content.js');
 
