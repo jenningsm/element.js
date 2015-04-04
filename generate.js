@@ -1,6 +1,7 @@
 
 var cssify = require('./cssify.js');
 var selectorName = require('./csscompile.js').selectorName;
+var applyChildStyles = require('./styles.js').applyChildStyles;
 
 function generate(shared, legible){
 
@@ -9,7 +10,7 @@ function generate(shared, legible){
   var iter = this.iterator();
   var i;
   while((i = iter()) !== null){
-    i.applyChildStyles();
+    applyChildStyles(i);
   }
   var ssheet = cssify(this, legible);
   var html = toHTML(this, legible === undefined ? legible : '');

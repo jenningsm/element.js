@@ -26,21 +26,21 @@ function childStyle(styler){
   return this;
 }
 
-function applyChildStyles(){
+function applyChildStyles(element){
 
-  for(var i = 0; i < this.contentList.length; i++){
-    for(var j = 0; j < this.childStyles.length; j++){
-      if(this.instance(this.contentList[i])){
-        if(typeof this.childStyles[j] === 'function'){
-          this.contentList[i].style(this.childStyles[j](i));
+  for(var i = 0; i < element.contentList.length; i++){
+    for(var j = 0; j < element.childStyles.length; j++){
+      if(element.instance(element.contentList[i])){
+        if(typeof element.childStyles[j] === 'function'){
+          element.contentList[i].style(element.childStyles[j](i));
         } else {
-          this.contentList[i].style(this.childStyles[j]);
+          element.contentList[i].style(element.childStyles[j]);
         }
       }
     }
   }
 
-  return this;
+  return element;
 }
 
 module.exports.style = s;

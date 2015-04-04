@@ -53,7 +53,6 @@ Element.prototype.content = require('./content.js');
 var sty = require('./styles.js');
 Element.prototype.style = sty.style;
 Element.prototype.childStyle = sty.childStyle;
-Element.prototype.applyChildStyles = sty.applyChildStyles;
 
 Element.prototype.attribute = require('./attributes.js');
 
