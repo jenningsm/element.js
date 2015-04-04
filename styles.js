@@ -27,28 +27,21 @@ function childStyle(styler){
 }
 
 function applyChildStyles(){
-  applyStyleHelper(this.contentData, [], this.childStyles);
-  return this;
-}
 
-function applyStyleHelper(arr, indices, styles){
-  if(!Array.isArray(arr)){
-    if(typeof arr !== 'string'){
-      for(var i = 0; i < styles.length; i++){
-        if(typeof styles[i] === 'function'){
-          arr.style(styles[i].apply(this, indices));
+  for(var i = 0; i < this.contentList.length; i++){
+    for(var j = 0; j < this.childStyles.length; j++){
+      if(this.isinstanceof(this.contentList[i])){
+        if(typeof this.childStyles[j] === 'function'){
+          this.contentList[i].style(this.childStyles[j](i));
         } else {
-          arr.style(styles[i]);
+          this.contentList[i].style(this.childStyles[j]);
         }
       }
     }
-  } else {
-    for(var i = 0; i < arr.length; i++){
-      applyStyleHelper(arr[i], indices.concat([i]), styles);
-    }
   }
-}
 
+  return this;
+}
 
 module.exports.style = s;
 module.exports.childStyle = childStyle;

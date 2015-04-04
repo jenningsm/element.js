@@ -1,48 +1,22 @@
 
-//set the content of an element
+//set the contentList of an element
 function content(){
-  var args = [];
+
   for(var i = 0; i < arguments.length; i++){
-    args.push(arguments[i]);
-  }
-
-  this.contentData = this.contentData.concat(contentHelper(args));
-  this.contentList = flatten(this.contentData);
-  return this;
-}
-
-function contentHelper(content){
-  var ret;
-  if(Array.isArray(content)){
-    ret = [];
-    for(var i = 0; i < content.length; i++){
-      if(typeof content[i] === 'function'){
-        ret = ret.concat(contentHelper(content[i]));
-      } else {
-        ret.push(contentHelper(content[i]));
+    if(Array.isArray(arguments[i])){
+      this.contentList = this.contentList.concat(arguments[i]);
+    } else if(typeof arguments[i] === 'function'){
+      for(var j = 0, item; (item = arguments[i](j)) !== null; j++){
+        this.contentList.push(item);
       }
+    } else if((typeof arguments[i] === 'string') || this.isinstanceof(arguments[i])){
+      this.contentList.push(arguments[i]);
+    } else {
+      console.error("Unsupported contentList:", arguments[i]);
     }
-  } else if (typeof content === 'function') {
-    ret = [];
-    for(var i = 0, item; (item = content(i)) !== null; i++){
-      ret.push(item);
-    }
-  } else {
-    ret = content;
   }
-  return ret;
-}
 
-function flatten(arr){
-  if(!Array.isArray(arr)){
-    return [arr];
-  } else {
-    var ret = [];
-    for(var i = 0; i < arr.length; i++){
-      ret = ret.concat(flatten(arr[i]));
-    }
-    return ret;
-  }
+  return this;
 }
 
 module.exports = content;

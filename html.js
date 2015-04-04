@@ -7,7 +7,6 @@
 */
 function Element(tag, attributes, value){
   this.tag = tag;
-  this.contentData = [];
   this.contentList = [];
   this.attributes = {};
   this.styles = {};
@@ -22,6 +21,9 @@ function Element(tag, attributes, value){
   }
 }
 
+Element.prototype.isinstanceof = function(v){
+  return (v instanceof Element);
+}
 
 Element.prototype.iterator = function (){
   var currgen = [this];
@@ -35,10 +37,9 @@ Element.prototype.iterator = function (){
         nextgen = [];
       }
     }
-    var content = currgen[0].contentList;
-    for(var i = 0; i < content.length; i++){
-      if(typeof content[i] !== 'string'){
-        nextgen.push(content[i]);
+    for(var i = 0; i < currgen[0].contentList.length; i++){
+      if(typeof currgen[0].contentList[i] !== 'string'){
+        nextgen.push(currgen[0].contentList[i]);
       }
     }
     return currgen.splice(0, 1)[0];
