@@ -8,13 +8,15 @@
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
 */
 function s(style, value){
-  if(value === undefined){
-    var keys = Object.keys(style);
-    for(var i = 0; i < keys.length; i++){
-      this.styles[keys[i]] = style[keys[i]];
-    }
-  } else {
+  if(value !== undefined && typeof value === 'string'){
     this.styles[style] = value;
+  } else {
+    for(var i = 0; i < arguments.length; i++){
+      var keys = Object.keys(arguments[i]);
+      for(var j = 0; j < keys.length; j++){
+        this.styles[keys[j]] = arguments[i][keys[j]];
+      }
+    }
   }
   return this;
 }
