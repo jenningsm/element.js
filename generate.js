@@ -41,7 +41,7 @@ function shareVars(shared){
       }
       sharedScript += "'" + sharedVars[i] + "': get('" + id + "'),";
     } else {
-      sharedScript += "'" + sharedVars[i] + "':'" + shared[sharedVars[i]].toString() + "',";
+      sharedScript += "'" + sharedVars[i] + "':" + JSON.stringify(shared[sharedVars[i]]) + ",";
     }
   }
   if(i > 0){
