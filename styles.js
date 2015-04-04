@@ -30,7 +30,7 @@ function applyChildStyles(){
 
   for(var i = 0; i < this.contentList.length; i++){
     for(var j = 0; j < this.childStyles.length; j++){
-      if(this.isinstanceof(this.contentList[i])){
+      if(this.instance(this.contentList[i])){
         if(typeof this.childStyles[j] === 'function'){
           this.contentList[i].style(this.childStyles[j](i));
         } else {

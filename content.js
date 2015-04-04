@@ -9,7 +9,7 @@ function content(){
       for(var j = 0, item; (item = arguments[i](j)) !== null; j++){
         this.contentList.push(item);
       }
-    } else if((typeof arguments[i] === 'string') || this.isinstanceof(arguments[i])){
+    } else if((typeof arguments[i] === 'string') || this.instance(arguments[i])){
       this.contentList.push(arguments[i]);
     } else {
       console.error("Unsupported contentList:", arguments[i]);

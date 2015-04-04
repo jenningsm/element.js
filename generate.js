@@ -4,7 +4,7 @@ var selectorName = require('./csscompile.js').selectorName;
 
 function generate(shared, legible){
 
-  var sharedScript = this.shareVars(shared);
+  var sharedScript = shareVars(this, shared);
 
   var iter = this.iterator();
   var i;
@@ -12,12 +12,16 @@ function generate(shared, legible){
     i.applyChildStyles();
   }
   var ssheet = cssify(this, legible);
-  var html = this.toHTML(legible === undefined ? legible : '');
+  var html = toHTML(this, legible === undefined ? legible : '');
 
   return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
 }
 
-function shareVars(shared){
+module.exports = generate;
+
+//////////////////////////////////////////////////////////
+
+function shareVars(element, shared){
   var sharedVars = Object.keys(shared);
   var sharedScript = 
         'var pbr = function(){' +
@@ -29,7 +33,7 @@ function shareVars(shared){
             'return {';
   var newids = 0;
   for(var i = 0; i < sharedVars.length; i++){
-    if(this.isinstanceof(shared[sharedVars[i]])){
+    if(element.instance(shared[sharedVars[i]])){
       var id;
       var el = shared[sharedVars[i]];
       if(el.attributes.id !== undefined){
@@ -52,33 +56,30 @@ function shareVars(shared){
   return sharedScript;
 }
 
-function toHTML(spaces){
+function toHTML(element, spaces){
   var indent = (spaces === undefined ? '' : spaces);
   var newline = (spaces === undefined ? '' : '\n');
-  var open = indent + "<" + this.tag;
-  if(this.classes !== undefined){
-    this.attributes['class'] = this.classes;
+  var open = indent + "<" + element.tag;
+  if(element.classes !== undefined){
+    element.attributes['class'] = element.classes;
   }
-  var akeys = Object.keys(this.attributes);
+  var akeys = Object.keys(element.attributes);
   for(var i = 0; i < akeys.length; i++){
-    open += " " + akeys[i] + '="' + this.attributes[akeys[i]] + '"';
+    open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
   }
   open += ">" + newline;
  
   var content = '';
-  for(var i = 0; i < this.contentList.length; i++){
-    if(typeof this.contentList[i] === 'string'){
-      content += (spaces === undefined ? '' : '  ') + indent + this.contentList[i] + newline;
+  for(var i = 0; i < element.contentList.length; i++){
+    if(typeof element.contentList[i] === 'string'){
+      content += (spaces === undefined ? '' : '  ') + indent + element.contentList[i] + newline;
     } else {
-      content += this.contentList[i].toHTML(spaces === undefined ? spaces : spaces + '  ') + newline;
+      content += toHTML(element.contentList[i], spaces === undefined ? spaces : spaces + '  ') + newline;
     }
   }
 
-  var close = indent + "</" + this.tag + ">";
+  var close = indent + "</" + element.tag + ">";
 
   return open + content + close;
 }
 
-module.exports.generate = generate;
-module.exports.toHTML = toHTML;
-module.exports.shareVars = shareVars;
