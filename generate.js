@@ -29,7 +29,7 @@ function shareVars(shared){
             'return {';
   var newids = 0;
   for(var i = 0; i < sharedVars.length; i++){
-    if(shared[sharedVars[i]].constructor.name === this.constructor.name){
+    if(this.isinstanceof(shared[sharedVars[i]])){
       var id;
       var el = shared[sharedVars[i]];
       if(el.attributes.id !== undefined){
