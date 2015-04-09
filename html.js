@@ -56,5 +56,8 @@ Element.prototype.childStyle = sty.childStyle;
 
 Element.prototype.attribute = require('./attributes.js');
 
+var embed = require('./embed.js');
+Element.prototype.embedJS = embed.embedJS;
+Element.prototype.embedCSS = embed.embedCSS;
 
 module.exports = Element;

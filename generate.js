@@ -6,6 +6,7 @@ var cssify = require('./cssify.js');
 var applyChildStyles = require('./styles.js').applyChildStyles;
 
 function generate(shared, legible){
+  //the order in which each these calls are made is very important
 
   var sharedScript = shareVars(shared, this.instance);
 
@@ -14,19 +15,49 @@ function generate(shared, legible){
   while((i = iter()) !== null){
     applyChildStyles(i);
   }
-  var ssheet = cssify(this, legible);
-  var html = toHTML(this, legible === undefined ? legible : '');
+  var styles = cssify(this, legible);
 
-  return {'html' : html, 'css' : ssheet, 'js' : sharedScript};
+  // the 'this.constructor' awkwardness needs to be fixed
+  var embeddedCSS = new this.constructor('style').content(styles);
+  var embeddedJS = new this.constructor('script').content(sharedScript);
+
+  styles = (appendAt(this, 'cssSpot', embeddedCSS) ? null : styles)
+  sharedScript = (appendAt(this, 'jsSpot', embeddedJS) ? null : sharedScript)
+
+  var html = toHTML(this, '', legible === undefined ? '' : '  ');
+
+  var ret = {'html' : html};
+  if(styles !== null){
+    ret.css = styles;
+  }
+  if(sharedScript !== null){
+    ret.js = sharedScript;
+  }
+
+  return ret
 }
 
 
 
 //////////////////////////////////////////////////////////
 
-function toHTML(element, spaces){
-  var indent = (spaces === undefined ? '' : spaces);
-  var newline = (spaces === undefined ? '' : '\n');
+//iterates through element and appends insert at the first
+//element with the property flag defined
+//returns false if there is no such element, else returns true
+function appendAt(element, flag, insert){
+  var iter, item;
+  iter = element.iterator();
+  while((item = iter()) !== null){
+    if(item[flag] !== undefined){
+      item.content(insert);
+      return true;
+    }
+  }
+  return false;
+}
+
+function toHTML(element, indent, tab){
+  var newline = (tab === '' ? '' : '\n');
   var open = indent + "<" + element.tag;
   if(element.classes !== undefined){
     element.attributes['class'] = element.classes;
@@ -40,9 +71,9 @@ function toHTML(element, spaces){
   var content = '';
   for(var i = 0; i < element.contentList.length; i++){
     if(typeof element.contentList[i] === 'string'){
-      content += (spaces === undefined ? '' : '  ') + indent + element.contentList[i] + newline;
+      content += tab + indent + element.contentList[i].replace(/\n/g, '\n' + tab + indent) + newline;
     } else {
-      content += toHTML(element.contentList[i], spaces === undefined ? spaces : spaces + '  ') + newline;
+      content += toHTML(element.contentList[i], indent + tab, tab) + newline;
     }
   }
 
