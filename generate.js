@@ -24,7 +24,7 @@ function generate(shared, legible){
   styles = (appendAt(this, 'cssSpot', embeddedCSS) ? null : styles)
   sharedScript = (appendAt(this, 'jsSpot', embeddedJS) ? null : sharedScript)
 
-  var html = toHTML(this, '', legible === undefined ? '' : '  ');
+  var html = toHTML(this, '', legible !== true ? '' : '  ');
 
   var ret = {'html' : html};
   if(styles !== null){

@@ -29,8 +29,8 @@ module.exports = function(root, legible){
 }
 
 function createStyleSheet(classes, legible){
-  var newline = (legible === undefined ? '' : '\n');
-  var indent = (legible === undefined ? '' : '  ');
+  var newline = (legible !== true ? '' : '\n');
+  var indent = (legible !== true ? '' : '  ');
   var stylesheet = '';
   for(cls in classes){
     if(classes.hasOwnProperty(cls)){
