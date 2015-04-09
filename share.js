@@ -11,7 +11,7 @@ function shareVars(shared, test){
               'return function(){' + 
                  'return document.getElementById(id)' + 
               '}' + 
-            '}\n' +
+            '}' +
             'return ';
 
   sharedScript += substitutedString(shared, test);
