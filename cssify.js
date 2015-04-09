@@ -1,30 +1,7 @@
 
 var cc = require('./csscompile');
 
-function createStyleSheet(classes, legible){
-  var newline = (legible === undefined ? '' : '\n');
-  var indent = (legible === undefined ? '' : '  ');
-  var stylesheet = '';
-  for(cls in classes){
-    if(classes.hasOwnProperty(cls)){
-      stylesheet += '.' + cls + '{' + newline;
-      for(var j = 0; j < classes[cls].length; j++){
-        stylesheet += indent + classes[cls][j] + ';' + newline;
-      }
-      stylesheet += '}' + newline;
-    }
-  }
-  return stylesheet;
-} 
-
-function format(string){
-   string = string.replace(/^\s*/g, '');
-   string = string.replace(/\s*$/g, '');
-   string = string.replace(/\s+/g, ' ');
-   return string;
-}
-
-function cssify(root, legible){
+module.exports = function(root, legible){
   var elements = [];
   var iter = root.iterator();
   var el;
@@ -51,4 +28,29 @@ function cssify(root, legible){
   return createStyleSheet(a['styles'], legible); 
 }
 
-module.exports = cssify;
+function createStyleSheet(classes, legible){
+  var newline = (legible === undefined ? '' : '\n');
+  var indent = (legible === undefined ? '' : '  ');
+  var stylesheet = '';
+  for(cls in classes){
+    if(classes.hasOwnProperty(cls)){
+      stylesheet += '.' + cls + '{' + newline;
+      for(var j = 0; j < classes[cls].length; j++){
+        stylesheet += indent + classes[cls][j] + ';' + newline;
+      }
+      stylesheet += '}' + newline;
+    }
+  }
+  return stylesheet;
+} 
+
+function format(string){
+   //remove spaces at beginning
+   string = string.replace(/^\s*/g, '');
+   //remove spaces at end
+   string = string.replace(/\s*$/g, '');
+   //remove repeated spaces
+   string = string.replace(/\s+/g, ' ');
+   return string;
+}
+
