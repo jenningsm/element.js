@@ -93,7 +93,7 @@ function toHTML(element, indent, tab){
   }
 
   var close = '';
-  if(!selfClosing || element.contentList.length !== 0){
+  if(!selfClosing){
     if(element.contentList.length !== 0){
       close += indent;
     }
