@@ -57,14 +57,25 @@ function appendAt(element, flag, insert){
 }
 
 function toHTML(element, indent, tab){
-  var newline = (tab === '' ? '' : '\n');
-  var open = indent + "<" + element.tag;
+  var newline = (tab === '' ? '' : '\n')
+
+  var selfClosing = (element.tag.slice(-1) === '/');
+
+  var open = indent + "<"
+  if(selfClosing){
+    open += element.tag.slice(0, -1)
+  } else {
+    open += element.tag
+  }
   if(element.classes !== undefined){
     element.attributes['class'] = element.classes;
   }
   var akeys = Object.keys(element.attributes);
   for(var i = 0; i < akeys.length; i++){
     open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
+  }
+  if(selfClosing){
+    open += '/';
   }
   open += ">";
  
@@ -82,10 +93,12 @@ function toHTML(element, indent, tab){
   }
 
   var close = '';
-  if(element.contentList.length !== 0){
-    close += indent;
+  if(element.tag.slice(-1) !== '/' || element.contentList.length !== 0){
+    if(element.contentList.length !== 0){
+      close += indent;
+    }
+    close += "</" + element.tag + ">";
   }
-  close += "</" + element.tag + ">";
 
   return open + content + close;
 }
