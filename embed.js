@@ -1,10 +1,10 @@
 
 module.exports.embedJS = function(){
-  this.jsSpot = true;
+  this.flags.embedJS = true;
   return this;
 }
 
 module.exports.embedCSS = function(){
-  this.cssSpot = true;
+  this.flags.embedCSS = true;
   return this;
 }

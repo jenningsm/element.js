@@ -21,8 +21,8 @@ function generate(shared, legible){
   var embeddedCSS = new this.constructor('style').content(styles);
   var embeddedJS = new this.constructor('script').content(sharedScript);
 
-  styles = (appendAt(this, 'cssSpot', embeddedCSS) ? null : styles)
-  sharedScript = (appendAt(this, 'jsSpot', embeddedJS) ? null : sharedScript)
+  styles = (appendAt(this, 'embedCSS', embeddedCSS) ? null : styles)
+  sharedScript = (appendAt(this, 'embedJS', embeddedJS) ? null : sharedScript)
 
   var html = toHTML(this, '', legible !== true ? '' : '  ');
 
@@ -48,7 +48,7 @@ function appendAt(element, flag, insert){
   var iter, item;
   iter = element.iterator();
   while((item = iter()) !== null){
-    if(item[flag] !== undefined){
+    if(item.flags[flag] !== undefined){
       item.content(insert);
       return true;
     }

@@ -1,27 +1,57 @@
 
 //set the contentList of an element
-function content(){
+module.exports = function(){
 
+  var args = [];
   for(var i = 0; i < arguments.length; i++){
-    if((typeof arguments[i] === 'string') || this.instance(arguments[i])){
-      this.contentList.push(arguments[i]);
-    } else if(Array.isArray(arguments[i])){
-      this.contentList = this.contentList.concat(arguments[i]);
-    } else if(typeof arguments[i] === 'function'){
-      for(var j = 0, item; (item = arguments[i](j)) !== null; j++){
-        this.contentList.push(item);
-      }
-    } else if(arguments[i] !== null && typeof arguments[i] === 'object'){
-      var keys = Object.keys(arguments[i]);
-      for(var j = 0; j < keys.length; j++){
-        this.contentList.push(arguments[i][keys[j]]);
-      }
-    } else {
-      console.error("cannot insert ", arguments[i]);
+    args.push(arguments[i]);
+  }
+
+  if(this.capturor !== undefined){
+    this.capturor.content(args)
+    return this
+  }
+
+  var el = this;
+  function leafTest(object){
+    return (el.instance(object) || typeof object === 'string')
+  }
+
+  var items = flatten(args, leafTest);
+  for(var i = 0; i < items.length; i++){
+    if(this.instance(items[i]) && items[i].flags.capture === true){
+      this.capturor = items[i];
     }
   }
+  this.contentList = this.contentList.concat(items);
 
   return this;
 }
 
-module.exports = content;
+function flatten(object, leafTest){
+
+  if(leafTest(object)){
+    return [object]
+  } else if(Array.isArray(object)){
+    var ret = [];
+    for(var i = 0; i < object.length; i++){
+      ret = ret.concat(flatten(object[i], leafTest))
+    }
+    return ret
+  } else if(typeof object === 'function'){
+    var ret = [];
+    for(var j = 0, item; (item = object(j)) !== null; j++){
+      ret = ret.concat(flatten(item, leafTest))
+    }
+    return ret
+  } else if(object !== null && typeof object === 'object'){
+    var ret = [];
+    var keys = Object.keys(object);
+    for(var j = 0; j < keys.length; j++){
+      ret = ret.concat(flatten(object[keys[j]], leafTest))
+    }
+    return ret
+  } else {
+    return [object]
+  }
+}

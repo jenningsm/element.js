@@ -11,6 +11,7 @@ function Element(tag, attributes, value){
   this.attributes = {};
   this.styles = {};
   this.childStyles = [];
+  this.flags = {};
 
   if(attributes !== undefined){
     if(value === undefined){
@@ -44,6 +45,11 @@ Element.prototype.iterator = function (){
     }
     return currgen.splice(0, 1)[0];
   }
+}
+
+Element.prototype.capture = function(){
+  this.flags.capture = true;
+  return this;
 }
 
 Element.prototype.generate = require('./generate.js');
