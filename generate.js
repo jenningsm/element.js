@@ -66,8 +66,12 @@ function toHTML(element, indent, tab){
   for(var i = 0; i < akeys.length; i++){
     open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
   }
-  open += ">" + newline;
+  open += ">";
  
+  if(element.contentList.length !== 0){
+    open += newline;
+  }
+
   var content = '';
   for(var i = 0; i < element.contentList.length; i++){
     if(typeof element.contentList[i] === 'string'){
@@ -77,7 +81,11 @@ function toHTML(element, indent, tab){
     }
   }
 
-  var close = indent + "</" + element.tag + ">";
+  var close = '';
+  if(element.contentList.length !== 0){
+    close += indent;
+  }
+  close += "</" + element.tag + ">";
 
   return open + content + close;
 }
