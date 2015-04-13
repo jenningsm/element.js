@@ -58,29 +58,36 @@ function appendAt(element, flag, insert){
 
 function toHTML(element, indent, tab){
   var newline = (tab === '' ? '' : '\n')
+  var selfClosing = false;
 
-  var selfClosing = (element.tag.slice(-1) === '/');
-
-  var open = indent + "<"
-  if(selfClosing){
-    open += element.tag.slice(0, -1)
+  var open;
+  if(element.tag !== null){
+    selfClosing = (element.tag.slice(-1) === '/');
+  
+    open = indent + "<"
+    if(selfClosing){
+      open += element.tag.slice(0, -1)
+    } else {
+      open += element.tag
+    }
+    if(element.classes !== undefined){
+      element.attributes['class'] = element.classes;
+    }
+    var akeys = Object.keys(element.attributes);
+    for(var i = 0; i < akeys.length; i++){
+      open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
+    }
+    if(selfClosing){
+      open += '/';
+    }
+    open += ">";
+   
+    if(element.contentList.length !== 0){
+      open += newline;
+    }
   } else {
-    open += element.tag
-  }
-  if(element.classes !== undefined){
-    element.attributes['class'] = element.classes;
-  }
-  var akeys = Object.keys(element.attributes);
-  for(var i = 0; i < akeys.length; i++){
-    open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
-  }
-  if(selfClosing){
-    open += '/';
-  }
-  open += ">";
- 
-  if(element.contentList.length !== 0){
-    open += newline;
+    tab = '';
+    open = '';
   }
 
   var content = '';
@@ -93,11 +100,13 @@ function toHTML(element, indent, tab){
   }
 
   var close = '';
-  if(!selfClosing){
-    if(element.contentList.length !== 0){
-      close += indent;
+  if(element.tag !== null){
+    if(!selfClosing){
+      if(element.contentList.length !== 0){
+        close += indent;
+      }
+      close += "</" + element.tag + ">";
     }
-    close += "</" + element.tag + ">";
   }
 
   return open + content + close;

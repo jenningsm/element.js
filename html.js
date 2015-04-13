@@ -6,12 +6,19 @@
   value: only defined if attributes is a string. if defined, is the value for the attribute
 */
 function Element(tag, attributes, value){
-  this.tag = tag;
+
   this.contentList = [];
   this.attributes = {};
   this.styles = {};
   this.childStyles = [];
   this.flags = {};
+
+  if(tag !== undefined){
+    this.tag = tag;
+  } else {
+    this.tag = null;
+    this.capture();
+  }
 
   if(attributes !== undefined){
     if(value === undefined){
