@@ -1,10 +1,10 @@
 
 module.exports = shareVars;
 
-var selectorName = require('./csscompile.js').selectorName;
+var selectorName = require('./selectorname.js')
 
-//test is a function that tests whether an object is one of our Element objects
-function shareVars(shared, test){
+//isElement is a function that tests whether a given object is an element
+function shareVars(element, isElement){
   var sharedScript = 
         'var pbr = function(){' +
            'function get(id){' +
@@ -14,56 +14,57 @@ function shareVars(shared, test){
             '}' +
             'return ';
 
-  sharedScript += substitutedString(shared, test);
+  sharedScript += shareString(element, isElement);
   sharedScript += ' }();';
 
   return sharedScript;
 }
 
-//test is a function that tests whether an object is one of our Element objects
 var newids = 0;
-function substitutedString(shared, test){
+//isElement is a function that tests whether a given object is an element
+function shareString(element, isElement){
   var ret = '';
-  if(test(shared)){
+  if(isElement(element)){
     var id;
-    if(shared.attributes.id !== undefined){
-      id = shared.attributes.id;
+    if(element.attributes.id !== undefined){
+      id = element.attributes.id;
     } else {
       id = selectorName(newids);
       newids++;
-      shared.attribute('id', id);
+      element.attribute('id', id);
     }
-    ret = "get('" + id + "')";
+    return "get('" + id + "')";
 
-  } else if(Array.isArray(shared)){
+  } else if(Array.isArray(element)){
     ret = '[';
-    for(var i = 0; i < shared.length; i++){
-      ret += substitutedString(shared[i], test) + ',';
+    for(var i = 0; i < element.length; i++){
+      ret += shareString(element[i], isElement) + ',';
     }
     if(i > 0){//remove the trailing comma
       ret = ret.substring(0, ret.length - 1);
     }
-    ret += ']';
+    ret += ']'
+    return ret
 
-  } else if(shared !== null & typeof shared === 'object'){
+  } else if(element !== null & typeof element === 'object'){
     ret = '{';
-    var keys = Object.keys(shared);
+    var keys = Object.keys(element);
     for(var i = 0; i < keys.length; i++){
       ret += keys[i] + ':';
-      ret += substitutedString(shared[keys[i]], test) + ',';
+      ret += shareString(element[keys[i]], isElement) + ',';
     }
     if(i > 0){//remove the trailing comma
       ret = ret.substring(0, ret.length - 1);
     }
     ret += '}';
+    return ret
 
-  } else if(shared === null){
-    ret = 'null';
+  } else if(element === null){
+    return 'null';
 
-  } else if(typeof shared === 'string') {
-    ret = "'" + shared + "'";
+  } else if(typeof element === 'string') {
+    return "'" + element + "'";
   } else {
-    ret = shared;
+    return element
   }
-  return ret;
 }

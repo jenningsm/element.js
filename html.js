@@ -34,27 +34,6 @@ Element.prototype.instance = function(v){
   return (v instanceof Element);
 }
 
-Element.prototype.iterator = function (){
-  var currgen = [this];
-  var nextgen = [];
-  return function(){
-    if(currgen.length === 0){
-      if(nextgen.length === 0){
-        return null;
-      } else {
-        currgen = nextgen;
-        nextgen = [];
-      }
-    }
-    for(var i = 0; i < currgen[0].contentList.length; i++){
-      if(typeof currgen[0].contentList[i] !== 'string'){
-        nextgen.push(currgen[0].contentList[i]);
-      }
-    }
-    return currgen.splice(0, 1)[0];
-  }
-}
-
 Element.prototype.capture = function(){
   this.flags.capture = true;
   return this;
@@ -65,9 +44,7 @@ Element.prototype.childFunction = function(func){
   return this;
 }
 
-Element.prototype.generate = require('./generate.js');
-
-Element.prototype.content = require('./content.js');
+Element.prototype.iterator = require('./iterator.js');
 
 var sty = require('./styles.js');
 Element.prototype.style = sty.style;
@@ -78,5 +55,9 @@ Element.prototype.attribute = require('./attributes.js');
 var embed = require('./embed.js');
 Element.prototype.embedJS = embed.embedJS;
 Element.prototype.embedCSS = embed.embedCSS;
+
+Element.prototype.content = require('./content.js');
+
+Element.prototype.generate = require('./generate.js');
 
 module.exports = Element;

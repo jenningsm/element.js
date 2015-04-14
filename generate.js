@@ -7,7 +7,7 @@ var cssify = require('./cssify.js');
 function generate(shared, legible){
   //the order in which each these calls are made is very important
 
-  applyChildFunction(this)
+  applyChildFunctions(this)
 
   var sharedScript = shareVars(shared, this.instance);
   var styles = cssify(this, legible);
@@ -36,7 +36,7 @@ function generate(shared, legible){
 //////////////////////////////////////////////////////////
 
 
-function applyChildFunction(element){
+function applyChildFunctions(element){
   if(typeof element === 'string')
     return
 
@@ -51,7 +51,7 @@ function applyChildFunction(element){
   }
 
   for(var i = 0; i < element.contentList.length; i++){
-    applyChildFunction(element.contentList[i]);
+    applyChildFunctions(element.contentList[i]);
   }
 }
 

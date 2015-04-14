@@ -1,12 +1,4 @@
 
-/*
-  set the style of an element. This function may be used in two ways:
-
-    style may be a string, in which case it represents a particular style, and value, which must
-    also be a string, represents the value for that style
-
-    otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
-*/
 module.exports.style = function(){
   var args = [this.overwrite, ''];
   for(var i = 0; i < arguments.length; i++){

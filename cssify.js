@@ -1,5 +1,5 @@
 
-var cc = require('./csscompile');
+var compile = require('./csscompile');
 
 module.exports = function(root, legible){
   var elements = [];
@@ -14,7 +14,7 @@ module.exports = function(root, legible){
     elements.push(styles);
   }
 
-  var a = cc.compile(elements);
+  var a = compile(elements);
 
   var classes = a['elements'];
   var iter = root.iterator();
