@@ -18,7 +18,7 @@ module.exports.pseudoStyle = function(prefix){
 }
 
 function addStyles(overwrite, prefix){
-  if(arguments.length === 4 && typeof arguments[3] === 'string'){
+  if(arguments.length === 4 && typeof arguments[3] !== 'object'){
     var a = {}
     a[arguments[2]] = arguments[3]
     arguments[2] = a
@@ -30,7 +30,7 @@ function addStyles(overwrite, prefix){
     for(var j = 0; j < keys.length; j++){
       var style = (prefix + keys[j]).replace(/\s/g, '')
       if(overwrite || this.styles[style] === undefined){
-        this.styles[style] = arguments[i][keys[j]];
+        this.styles[style] = arguments[i][keys[j]].toString();
       }
     }
   }
