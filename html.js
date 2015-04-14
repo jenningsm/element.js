@@ -22,11 +22,7 @@ function Element(tag, attributes, value){
   }
 
   if(attributes !== undefined){
-    if(value === undefined){
-      this.attributes = attributes;
-    } else {
-      this.attributes[attributes] = value;
-    }
+    this.attribute(attributes, value)
   }
 }
 
