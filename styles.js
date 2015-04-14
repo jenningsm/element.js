@@ -8,7 +8,7 @@
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
 */
 module.exports.style = function(){
-  var args = [''];
+  var args = [this.overwrite, ''];
   for(var i = 0; i < arguments.length; i++){
     args.push(arguments[i]);
   }
@@ -17,7 +17,7 @@ module.exports.style = function(){
 }
 
 module.exports.pseudoStyle = function(prefix){
-  var args = [prefix + '?'];
+  var args = [this.overwrite, prefix + '?'];
   for(var i = 1; i < arguments.length; i++){
     args.push(arguments[i]);
   }
@@ -25,14 +25,20 @@ module.exports.pseudoStyle = function(prefix){
   return this;
 }
 
-function addStyles(prefix){
-  if(arguments.length === 3 && typeof arguments[2] === 'string'){
-    this.styles[(prefix + arguments[1]).replace(/\s/g, '')] = arguments[2];
-  } else {
-    for(var i = 1; i < arguments.length; i++){
-      var keys = Object.keys(arguments[i]);
-      for(var j = 0; j < keys.length; j++){
-        this.styles[(prefix + keys[j]).replace(/\s/g, '')] = arguments[i][keys[j]];
+function addStyles(overwrite, prefix){
+  if(arguments.length === 4 && typeof arguments[3] === 'string'){
+    var a = {}
+    a[arguments[2]] = arguments[3]
+    arguments[2] = a
+    arguments[3] = undefined
+  }
+
+  for(var i = 2; arguments[i] !== undefined; i++){
+    var keys = Object.keys(arguments[i]);
+    for(var j = 0; j < keys.length; j++){
+      var style = (prefix + keys[j]).replace(/\s/g, '')
+      if(overwrite || this.styles[style] === undefined){
+        this.styles[style] = arguments[i][keys[j]];
       }
     }
   }

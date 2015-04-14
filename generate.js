@@ -40,6 +40,10 @@ function applyChildFunction(element){
   if(typeof element === 'string')
     return
 
+  for(var i = 0; i < element.contentList.length; i++){
+    element.contentList[i].overwrite = false
+  }
+
   for(var i = 0; i < element.childFunctions.length; i++){
     for( var j = 0; j < element.contentList.length; j++){
       element.childFunctions[i](element.contentList[j], j, element.contentList.length);

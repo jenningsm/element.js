@@ -12,6 +12,7 @@ function Element(tag, attributes, value){
   this.attributes = {};
   this.styles = {};
   this.flags = {};
+  this.overwrite = true
 
   if(tag !== undefined){
     this.tag = tag;
