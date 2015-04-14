@@ -8,9 +8,9 @@
 function Element(tag, attributes, value){
 
   this.contentList = [];
+  this.childFunctions = [];
   this.attributes = {};
   this.styles = {};
-  this.childStyles = [];
   this.flags = {};
 
   if(tag !== undefined){
@@ -59,6 +59,11 @@ Element.prototype.capture = function(){
   return this;
 }
 
+Element.prototype.childFunction = function(func){
+  this.childFunctions.push(func);
+  return this;
+}
+
 Element.prototype.generate = require('./generate.js');
 
 Element.prototype.content = require('./content.js');
@@ -66,7 +71,6 @@ Element.prototype.content = require('./content.js');
 var sty = require('./styles.js');
 Element.prototype.style = sty.style;
 Element.prototype.pseudoStyle = sty.pseudoStyle;
-Element.prototype.childStyle = sty.childStyle;
 
 Element.prototype.attribute = require('./attributes.js');
 

@@ -7,7 +7,7 @@
 
     otherwise, style is a dictionary whose keys are styles and whose values are the corresponding values
 */
-function style(){
+module.exports.style = function(){
   var args = [''];
   for(var i = 0; i < arguments.length; i++){
     args.push(arguments[i]);
@@ -16,7 +16,7 @@ function style(){
   return this;
 }
 
-function pseudoStyle(prefix){
+module.exports.pseudoStyle = function(prefix){
   var args = [prefix + '?'];
   for(var i = 1; i < arguments.length; i++){
     args.push(arguments[i]);
@@ -37,30 +37,3 @@ function addStyles(prefix){
     }
   }
 }
-
-function childStyle(styler){
-  this.childStyles.push(styler);
-  return this;
-}
-
-function applyChildStyles(element){
-
-  for(var i = 0; i < element.contentList.length; i++){
-    for(var j = 0; j < element.childStyles.length; j++){
-      if(element.instance(element.contentList[i])){
-        if(typeof element.childStyles[j] === 'function'){
-          element.contentList[i].style(element.childStyles[j](i));
-        } else {
-          element.contentList[i].style(element.childStyles[j]);
-        }
-      }
-    }
-  }
-
-  return element;
-}
-
-module.exports.style = style;
-module.exports.pseudoStyle = pseudoStyle;
-module.exports.childStyle = childStyle;
-module.exports.applyChildStyles = applyChildStyles;

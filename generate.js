@@ -3,21 +3,15 @@ module.exports = generate;
 
 var shareVars = require('./share.js');
 var cssify = require('./cssify.js');
-var applyChildStyles = require('./styles.js').applyChildStyles;
 
 function generate(shared, legible){
   //the order in which each these calls are made is very important
 
-  var sharedScript = shareVars(shared, this.instance);
+  applyChildFunction(this)
 
-  var iter = this.iterator();
-  var i;
-  while((i = iter()) !== null){
-    applyChildStyles(i);
-  }
+  var sharedScript = shareVars(shared, this.instance);
   var styles = cssify(this, legible);
 
-  // the 'this.constructor' awkwardness needs to be fixed
   var embeddedCSS = new this.constructor('style').content(styles);
   var embeddedJS = new this.constructor('script').content(sharedScript);
 
@@ -40,6 +34,23 @@ function generate(shared, legible){
 
 
 //////////////////////////////////////////////////////////
+
+
+function applyChildFunction(element){
+  if(typeof element === 'string')
+    return
+
+  for(var i = 0; i < element.childFunctions.length; i++){
+    for( var j = 0; j < element.contentList.length; j++){
+      element.childFunctions[i](element.contentList[j], j);
+    }
+  }
+
+  for(var i = 0; i < element.contentList.length; i++){
+    applyChildFunction(element.contentList[i]);
+  }
+}
+
 
 //iterates through element and appends insert at the first
 //element with the property flag defined
