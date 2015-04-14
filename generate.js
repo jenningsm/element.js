@@ -42,7 +42,7 @@ function applyChildFunction(element){
 
   for(var i = 0; i < element.childFunctions.length; i++){
     for( var j = 0; j < element.contentList.length; j++){
-      element.childFunctions[i](element.contentList[j], j);
+      element.childFunctions[i](element.contentList[j], j, element.contentList.length);
     }
   }
 
