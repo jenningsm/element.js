@@ -56,7 +56,7 @@ function createStyleSheet(classes, legible){
     for(var j = 0; j < pseudoNames.length; j++){
       stylesheet += '.' + classNames[i];
       if(pseudoNames[j] !== ''){
-        stylesheet += "::" + pseudoNames[j];
+        stylesheet += ":" + pseudoNames[j];
       }
       stylesheet += '{' + newline;
       var styles = pseudoStyles[pseudoNames[j]];
