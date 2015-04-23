@@ -18,7 +18,6 @@ function Element(tag, attributes, value){
     this.tag = tag;
   } else {
     this.tag = null;
-    this.capture();
   }
 
   if(attributes !== undefined){
