@@ -28,7 +28,8 @@ function addStyles(overwrite, prefix){
   for(var i = 2; arguments[i] !== undefined; i++){
     var keys = Object.keys(arguments[i]);
     for(var j = 0; j < keys.length; j++){
-      var style = (prefix + keys[j]).replace(/\s/g, '')
+      //var style = (prefix + keys[j]).replace(/\s/g, '')
+      var style = (prefix + keys[j])
       if(overwrite || this.styles[style] === undefined){
         this.styles[style] = arguments[i][keys[j]].toString();
       }

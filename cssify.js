@@ -9,7 +9,8 @@ module.exports = function(root, legible){
     var keys = Object.keys(el.styles);
     var styles = [];
     for(var i = 0 ; i < keys.length; i++){
-      styles.push(keys[i].replace(/\s/g, '') + ":" + format(el.styles[keys[i]]));
+      styles.push(keys[i] + ":" + format(el.styles[keys[i]]));
+      //styles.push(keys[i].replace(/\s/g, '') + ":" + format(el.styles[keys[i]]));
     }
     elements.push(styles);
   }

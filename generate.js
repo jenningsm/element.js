@@ -73,6 +73,7 @@ function appendAt(element, flag, insert){
 
 function toHTML(element, indent, tab){
   var newline = (tab === '' ? '' : '\n')
+  var nextTab = tab;
   var selfClosing = false;
 
   var open;
@@ -110,7 +111,7 @@ function toHTML(element, indent, tab){
     if(typeof element.contentList[i] === 'string'){
       content += tab + indent + element.contentList[i].replace(/\n/g, '\n' + tab + indent) + newline;
     } else {
-      content += toHTML(element.contentList[i], indent + tab, tab) + newline;
+      content += toHTML(element.contentList[i], indent + tab, nextTab) + newline;
     }
   }
 
