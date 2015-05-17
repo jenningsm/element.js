@@ -25,6 +25,11 @@ function Element(tag, attributes, value){
   }
 }
 
+Element.prototype.share = function(data){
+  this.sharedData = data
+  return this
+}
+
 Element.prototype.instance = function(v){
   return (v instanceof Element);
 }

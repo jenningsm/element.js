@@ -33,7 +33,13 @@ function shareString(element, isElement){
       newids++;
       element.attribute('id', id);
     }
-    return "get('" + id + "')";
+    var ret = "{'get':get('" + id + "')"
+
+    if(element.sharedData !== undefined){
+      ret += ",'data':" + shareString(element.sharedData, isElement)
+    }
+
+    return ret + "}";
 
   } else if(Array.isArray(element)){
     ret = '[';
@@ -50,7 +56,7 @@ function shareString(element, isElement){
     ret = '{';
     var keys = Object.keys(element);
     for(var i = 0; i < keys.length; i++){
-      ret += keys[i] + ':';
+      ret += "'" +  keys[i] + "':";
       ret += shareString(element[keys[i]], isElement) + ',';
     }
     if(i > 0){//remove the trailing comma
