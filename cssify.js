@@ -12,24 +12,26 @@ module.exports = function(root, legible){
     //for every selector
     for(var i = 0; i < el.selectors.length; i++){
 
-      var elChains = el.selectors[i].selector.getStructures()
-
-      //for every style chain
-      for(var k = 0; k < elChains.length; k++){
-        var hash = elChains[k].join('?')
-        var chain = styleChains[hash]
-        var position = el.selectors[i].position
-        if(chain === undefined)
-          chain = {'structure' : elChains[k], 'placeFillers' : []}
-
-        if(chain.placeFillers[position] === undefined)
-          chain.placeFillers[position] = []
-
-        //push the index of this element onto the list of indices of elements
-        //that fill this position in this style chain
-        chain.placeFillers[position].push(j)
-
-        styleChains[hash] = chain
+      if(el.selectors[i].selector.isStyled()){
+        var elChains = el.selectors[i].selector.getStructures()
+  
+        //for every style chain
+        for(var k = 0; k < elChains.length; k++){
+          var hash = elChains[k].join('?')
+          var chain = styleChains[hash]
+          var position = el.selectors[i].position
+          if(chain === undefined)
+            chain = {'structure' : elChains[k], 'placeFillers' : []}
+  
+          if(chain.placeFillers[position] === undefined)
+            chain.placeFillers[position] = []
+  
+          //push the index of this element onto the list of indices of elements
+          //that fill this position in this style chain
+          chain.placeFillers[position].push(j)
+  
+          styleChains[hash] = chain
+        }
       }
     }
   }
@@ -73,20 +75,7 @@ module.exports = function(root, legible){
     chains.push(fillPlaceHolders(styleChains[keys[i]].structure, styleChains[keys[i]].placeFillers))
   }
 
-  chains = chains.filter(function(value) { return value.length >= 3 })
-  console.log(generateStyleSheet(chains))
-/*  var a = compile(elements);
-
-  var classes = a['elements'];
-  var iter = root.iterator();
-  for(var i = 0; i < classes.length; i++){
-    var el = iter();
-    if(classes[i].length !== 0){
-      el.classes = classes[i].join(' ');
-    }
-  }
-
-  return createStyleSheet(a['styles'], legible); */
+  return generateStyleSheet(chains)
 }
 
 function removeDuplicates(array){
@@ -141,47 +130,6 @@ function fillPlaceHolders(structure, classes){
 }
 
 
-function createStyleSheet(classes, legible){
-  var newline = (legible !== true ? '' : '\n');
-  var indent = (legible !== true ? '' : '  ');
-  var stylesheet = '';
-  
-  var classNames = Object.keys(classes);
-  for(var i = 0; i < classNames.length; i++){
-    var cls = classes[classNames[i]];
-
-    var pseudoStyles = {}
-    for(var j = 0; j < cls.length; j++){
-      var style = cls[j].split('?')
-      if(style.length === 1){
-        style.push(style[0])
-        style[0] = '';
-      }
-
-      if(pseudoStyles[style[0]] === undefined){
-        pseudoStyles[style[0]] = [style[1]]
-      } else {
-        pseudoStyles[style[0]].push(style[1])
-      }
-    }
-
-    var pseudoNames = Object.keys(pseudoStyles);
-    for(var j = 0; j < pseudoNames.length; j++){
-      stylesheet += '.' + classNames[i];
-      if(pseudoNames[j] !== ''){
-        stylesheet += ":" + pseudoNames[j];
-      }
-      stylesheet += '{' + newline;
-      var styles = pseudoStyles[pseudoNames[j]];
-      for(var k = 0; k < styles.length; k++){
-       stylesheet += indent + styles[k] + ';' + newline
-      }
-      stylesheet += '}' + newline
-    }
-  }
-
-  return stylesheet;
-} 
 
 function format(string){
    //remove spaces at beginning
