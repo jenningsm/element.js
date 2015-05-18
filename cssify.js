@@ -73,8 +73,7 @@ module.exports = function(root, legible){
     chains.push(fillPlaceHolders(styleChains[keys[i]].structure, styleChains[keys[i]].placeFillers))
   }
 
-//  console.log(chains)
- //generateStyleSheet(chains)
+  chains = chains.filter(function(value) { return value.length >= 3 })
   console.log(generateStyleSheet(chains))
 /*  var a = compile(elements);
 
@@ -114,7 +113,7 @@ function generateStyleSheet(styleChains, indent){
       var chain = tops[keys[i]][j]
       if(chain.length === 2){
         styleString += indent + '  ' +  chain[0] + ':' + chain[1] + ';\n'
-      } else {
+      } else if(chain.length > 2){
         styleString += generateStyleSheet([chain], indent + '  ')
       }
     }

@@ -4,10 +4,7 @@ var count = 1
 module.exports = Selector
 function Selector(){
 
-   this.children = {}
-   this.childrenOrders = {}
-   this.styles = {}
-   this.styleOrders = {}
+   this.children = {'' : []}
    this.placeHolders = []
    this.hierarchy = []
 
@@ -26,79 +23,21 @@ function Selector(){
        this.placeHolders.push(placeHolder)
      }
    }
-  
-
-   if(i !== arguments.length){
-     this.style(arguments[i])
-   }
-
-   if(this.placeHolders.length <= 1){
-     this.id = 0
-   } else {
-     this.id = count++
-   }
 }
 
 
-Selector.prototype.setId = function(id){
-  this.id = "custom" + id
-  return this
-}
-
-var selectorUnitNum = 0
 Selector.prototype.nest = function(){
-  if(typeof arguments[0] === 'string'){
-
+  if(arguments[1] !== undefined){
     this.children[arguments[0]] = arguments[1]
-    this.childrenOrders[arguments[0]] = false
-
-  } else if(Array.isArray(arguments[0])){
-    for(var i = 0; i < arguments[0].length; i++){
-      this.children[arguments[i][0]] = arguments[i][1]
-      this.childrenOrders[arguments[i][0]] = {
-        'unit' : selectorUnitNum, 
-        'order' : i
-      }
-    }
-    selectorUnitNum++
   } else {
-    console.error("bad nesting input")
+    this.children[''].push(arguments[0])
   }
+
   return this
 }
 
-var styleUnitNum = 0
-
-Selector.prototype.style = function(){
-  if(typeof arguments[1] === 'string'){
-    this.styles[arguments[0]] = arguments[1]
-    this.styleOrders[arguments[0]] = false
-  } else {
-    for(var i = 0; i < arguments.length; i++){
-
-      if(Array.isArray(arguments[i])){
-        for(var j = 0; j < arguments[i].length; j++){
-          var keys = Object.keys(arguments[i][j])
-          for(var k = 0; k < keys.length; k++){
-            this.styles[keys[k]] = arguments[i][j][keys[k]]
-            this.styleOrders[keys[k]] = {
-              'unit' : styleUnitNum,
-              'order' : j
-            }
-          }
-        }
-        styleUnitNum++
-
-      } else if(typeof arguments[i] === 'object'){
-        var keys = Object.keys(arguments[i])
-        for(var j = 0; j < keys.length; j++){
-          this.styles[keys[j]] = arguments[i][keys[j]]
-          this.styleOrders[keys[j]] = false
-        }
-      }
-    }
-  }
-  return this
+Selector.prototype.style = function(style, value){
+  return this.nest(new Selector(style, value))
 }
 
 //returns false if this is not an existing path
@@ -113,6 +52,11 @@ Selector.prototype.getPlaceHolderIndex = function(path){
       if(this.placeHolders[i] === path[0])
         return i
     }
+    for(var j = 0; j < children[''].length; j++){
+      var index = this.children[''][j].getPlaceHolderIndex(path)
+      if(index !== false)
+        return this.placeHolders.length + index
+    }
     return false
   }
 }
@@ -126,43 +70,28 @@ Selector.prototype.getStructures = function(){
   
   var ret = []
 
-  var styles = {'noOrder' : {}}
-  var keys = Object.keys(this.styles)
-  for(var i = 0; i < keys.length; i++){
-    var order = this.styleOrders[keys[i]]
-    if(order === undefined || order === false){
-      styles['noOrder'][keys[i]] = this.styles[keys[i]]
-    } else {
-      if(styles[order.unit] === undefined)
-        styles[order.unit] = {}
-
-      styles[order.unit][order.order] = [keys[i], this.styles[keys[i]]]
-    }
-  }
-
-  var keys =  Object.keys(styles['noOrder'])
-  for(var i = 0; i < keys.length; i++){
-    ret.push(strippedHierarchy.concat([keys[i], styles['noOrder'][keys[i]]]))
-  }
- 
-  var keys = Object.keys(styles)
-  for(var i = 0; i < keys.length; i++){
-    if(!isNaN(keys[i])){
-      var orderKeys = Object.keys(styles[keys[i]]).sort()
-      var styleString = ''
-      for(var j = 0; j < orderKeys.length; j++){
-        var style = styles[keys[i]][orderKeys[j]]
-        styleString += style[0] + ':' + style[1] + ';' 
+  var keys = Object.keys(this.children)
+  if(keys.length === 1 && this.children[''].length === 0){
+    ret = [strippedHierarchy]
+  } else {
+    for(var i = 0; i < this.children[''].length; i++){
+      var childStructures = this.children[''][i].getStructures()
+      for(var j = 0; j < childStructures.length; j++){
+        ret.push(strippedHierarchy.concat(childStructures[j]))
       }
-      ret.push(strippedHierarchy.concat([styleString]))
     }
+    for(var i = 0; i < keys.length; i++){
+      if(keys[i] !== ''){
+        var childStructures = this.children[keys[i]].getStructures()
+        for(var j = 0; j < childStructures.length; j++){
+          ret.push(strippedHierarchy.concat(childStructures[j]))
+        }
+      }
+    }
+   
   }
 
-  for(var i = 0; i < ret.length; i++){
-//    console.log(ret[i])
-  }
   return ret
-
 }
 
 
