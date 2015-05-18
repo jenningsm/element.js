@@ -118,14 +118,25 @@ function define(item, to){
 }
 
 function fillPlaceHolders(structure, classes){
-  for(var i = 0, j = 0; j < classes.length; i++){
+
+  for(var i = 0; i < structure.length; i++){
+    var split = structure[i].split('$')
+    for(var j = 1; j < split.length; j++){
+      var spaced = split[j].split(' ')
+      var index = spaced[0]
+      split[j] = ['.' + classes[index]].concat(spaced.slice(1)).join(' ')
+    }
+    structure[i] = split.join('')
+  }
+
+/*  for(var i = 0, j = 0; j < classes.length; i++){
     var split = structure[i].split('$')
     for(k = 1; k < split.length; k++){
       split[k] = '.' + classes[j] + split[k]
       j++
     }
     structure[i] = split.join('')
-  }
+  }*/
   return structure
 }
 

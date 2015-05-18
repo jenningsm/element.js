@@ -33,6 +33,8 @@ Element.prototype.style = function(style){
 }
 
 Element.prototype.assign = function(selector, path){
+  if(selector.getPlaceHolderIndex(path) === false)
+    console.error("bad path: ", path)
   this.selectors.push({'selector' : selector, 'position' : selector.getPlaceHolderIndex(path)})
   return this
 }
