@@ -159,8 +159,10 @@ Selector.prototype.getStructures = function(){
   }
 
   for(var i = 0; i < ret.length; i++){
-    console.log(ret[i])
+//    console.log(ret[i])
   }
+  return ret
+
 }
 
 

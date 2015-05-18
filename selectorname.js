@@ -14,7 +14,7 @@ module.exports = function(i){
   length--;
 
   while (length > 0){
-    chars.push(Math.floor(i % numchars));
+    chars.unshift(Math.floor(i % numchars));
     i /= numchars;
     length--;
   } 
