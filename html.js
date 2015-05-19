@@ -28,13 +28,8 @@ function Element(tag, attributes, value){
 }
 
 Element.prototype.style = function(style){
-  if(arguments[1] !== undefined && typeof arguments[1] !== 'object'){
-    this.selectors[0]['selector'].style(arguments[0], arguments[1])
-  } else {
-    for(var i = 0; i < arguments.length; i++){
-      this.selectors[0]['selector'].style(arguments[i])
-    }
-  }
+  var sel = this.selectors[0]['selector']
+  sel.style.apply(sel, arguments)
   return this
 }
 

@@ -25,13 +25,21 @@ Selector.prototype.nest = function(){
 Selector.prototype.style = function(style, value){
   this.styled = true
 
-  if(arguments[1] !== undefined && typeof arguments[1] !== 'object'){
-    this.nest(style.toString(), new Selector(style.toString(), value.toString()))
+  if(typeof arguments[0] === 'string'){
+    if(!Array.isArray(arguments[1])){
+      this.nest(style.toString(), new Selector(style.toString(), value.toString()))
+    } else {
+      var nest = new Selector(style.toString())
+      for(var i = 0; i < arguments[1].length; i++){
+        nest.nest(new Selector(arguments[1][i].toString()))
+      }
+      this.nest(style.toString(), nest)
+    }
   } else {
     for(var i = 0; i < arguments.length; i++){
       var keys = Object.keys(arguments[i])
       for(var j = 0; j < keys.length; j++){
-        this.nest(keys[j].toString(), new Selector(keys[j].toString(), arguments[i][keys[j]].toString()))
+        this.style(keys[j], arguments[i][keys[j]])
       }
     }
   }

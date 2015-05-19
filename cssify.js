@@ -120,9 +120,11 @@ function fillPlaceHolders(structure, classes){
   for(var i = 0; i < structure.length; i++){
     var split = structure[i].split('$')
     for(var j = 1; j < split.length; j++){
-      var spaced = split[j].split(' ')
-      var index = spaced[0]
-      split[j] = ['.' + classes[index]].concat(spaced.slice(1)).join(' ')
+      var pEnd = split[j].search(/[^0-9]/)
+      if(pEnd === -1)
+        pEnd = split[j].length
+      var index = split[j].substr(0, pEnd)
+      split[j] = '.' + classes[index] + split[j].substr(pEnd)
     }
     structure[i] = split.join('')
   }

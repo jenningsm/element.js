@@ -15,10 +15,13 @@ function SelectorString(args){
    for(var i = 0; i < args.length; i++){
      var positions = []
      var split = args[i].split('$')
-     this.hierarchy[i] =  [format(split[0])]
+     this.hierarchy[i] =  [split[0]]
      for(var j = 1; j < split.length; j++){
-       var placeHolder = split[j].split(' ')[0]
-       this.hierarchy[i].push(format(split[j].split(' ').slice(1).join(' ')))
+       var pEnd = split[j].search(/[^a-z]/)
+       if(pEnd === -1)
+         pEnd = split[j].length
+       var placeHolder = split[j].substring(0, pEnd)
+       this.hierarchy[i].push(split[j].substr(pEnd))
        if(placeHolder === '')
          placeHolder = unnamedCount++
 
@@ -52,19 +55,9 @@ SelectorString.prototype.getHash = function(base){
   for(var i = 0; i < this.hierarchy.length; i++){
     var level = this.hierarchy[i][0]
     for(var j = 0; j < this.positions[i].length; j++){
-      level += ' $' + (this.positions[i][j] + base) + ' ' + this.hierarchy[i][j+1]
+      level += '$' + (this.positions[i][j] + base) + this.hierarchy[i][j+1]
     }
-    hashStructure.push(format(level))
+    hashStructure.push(level)
   }
   return hashStructure
-}
-
-function format(string){
-   //remove spaces at beginning
-   string = string.replace(/^\s*/g, '');
-   //remove spaces at end
-   string = string.replace(/\s*$/g, '');
-   //remove repeated spaces
-   string = string.replace(/\s+/g, ' ');
-   return string;
 }
