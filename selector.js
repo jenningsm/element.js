@@ -24,8 +24,19 @@ Selector.prototype.nest = function(){
 
 Selector.prototype.style = function(style, value){
   this.styled = true
-  return this.nest(new Selector(style, value))
 
+  if(arguments[1] !== undefined && typeof arguments[1] !== 'object'){
+    this.nest(style.toString(), new Selector(style.toString(), value.toString()))
+  } else {
+    for(var i = 0; i < arguments.length; i++){
+      var keys = Object.keys(arguments[i])
+      for(var j = 0; j < keys.length; j++){
+        this.nest(keys[j].toString(), new Selector(keys[j].toString(), arguments[i][keys[j]].toString()))
+      }
+    }
+  }
+
+  return this
 }
 
 Selector.prototype.isStyled = function(){
@@ -42,10 +53,6 @@ Selector.prototype.isStyled = function(){
       return true
   }
   return false
-}
-
-Selector.prototype.getFilledStructure = function(values){
-   
 }
 
 Selector.prototype.getPlaceHolderIndex = function(path){
@@ -67,7 +74,7 @@ Selector.prototype.getPlaceHolderIndex = function(path){
   }
 }
 
-Selector.prototype.getStructures = function(base){
+Selector.prototype.getHashes = function(base){
   if(base === undefined)
     base = 0
 
@@ -81,13 +88,13 @@ Selector.prototype.getStructures = function(base){
     ret = [hierarchyHash]
   } else {
     for(var i = 0; i < this.immediateChildren.length; i++){
-      var childStructures = this.immediateChildren[i].getStructures(base)
+      var childStructures = this.immediateChildren[i].getHashes(base)
       for(var j = 0; j < childStructures.length; j++){
         ret.push(hierarchyHash.concat(childStructures[j]))
       }
     }
     for(var i = 0; i < keys.length; i++){
-      var childStructures = this.indexedChildren[keys[i]].getStructures(base)
+      var childStructures = this.indexedChildren[keys[i]].getHashes(base)
       for(var j = 0; j < childStructures.length; j++){
         ret.push(hierarchyHash.concat(childStructures[j]))
       }

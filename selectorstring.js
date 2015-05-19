@@ -59,23 +59,6 @@ SelectorString.prototype.getHash = function(base){
   return hashStructure
 }
 
-SelectorString.prototype.getFilledString = function(values){
-  var hashStructure = []
-  for(var i = 0; i < this.hierarchy.length; i++){
-    var level = this.hierarchy[i][0]
-    for(var j = 0; j < this.positions[i].length; j++){
-      var id = this.positions[i][j]
-      //if the right values are not given, return false
-      if(values[id] === undefined)
-        return false
-      var cls = values[id]
-      level += ' $' + cls + ' ' + this.hierarchy[i][j+1]
-    }
-    hashStructure.push(format(level))
-  }
-  return hashStructure
-}
-
 function format(string){
    //remove spaces at beginning
    string = string.replace(/^\s*/g, '');

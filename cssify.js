@@ -13,7 +13,7 @@ module.exports = function(root, legible){
     for(var i = 0; i < el.selectors.length; i++){
 
       if(el.selectors[i].selector.isStyled()){
-        var elChains = el.selectors[i].selector.getStructures()
+        var elChains = el.selectors[i].selector.getHashes()
   
         //for every style chain
         for(var k = 0; k < elChains.length; k++){
@@ -128,15 +128,6 @@ function fillPlaceHolders(structure, classes){
     }
     structure[i] = split.join('')
   }
-
-/*  for(var i = 0, j = 0; j < classes.length; i++){
-    var split = structure[i].split('$')
-    for(k = 1; k < split.length; k++){
-      split[k] = '.' + classes[j] + split[k]
-      j++
-    }
-    structure[i] = split.join('')
-  }*/
   return structure
 }
 
