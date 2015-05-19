@@ -21,9 +21,9 @@ module.exports = function(elementSets){
   }
   
   var ret = []
-  var indices = Object.keys(indexToClass).sort()
+  var indices = Object.keys(indexToClass)
   for(var i = 0; i < indices.length; i++){
-    ret.push(indexToClass[indices[i]])
+    ret[indices[i]] = indexToClass[indices[i]]
   }
   return ret
 }

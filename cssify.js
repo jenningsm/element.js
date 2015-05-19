@@ -4,43 +4,41 @@ var compile = require('./csscompile');
 
 
 module.exports = function(root, legible){
-  var styleChains = {}
-  var iter = root.iterator();
-  var el;
+  var styles = {}
+  var iter = root.iterator(), el;
   //for every element
   for(var j = 0; (el = iter()) !== null; j++){
     //for every selector
     for(var i = 0; i < el.selectors.length; i++){
 
       if(el.selectors[i].selector.isStyled()){
-        var elChains = el.selectors[i].selector.getHashes()
+        var theseStyles = el.selectors[i].selector.getHashes()
   
-        //for every style chain
-        for(var k = 0; k < elChains.length; k++){
-          var hash = elChains[k].join('?')
-          var chain = styleChains[hash]
+        //for every style
+        for(var k = 0; k < theseStyles.length; k++){
+          var hash = theseStyles[k].join('?')
+          var style = styles[hash]
+          if(style === undefined)
+            style = {'style' : theseStyles[k], 'spots' : []}
+  
           var position = el.selectors[i].position
-          if(chain === undefined)
-            chain = {'structure' : elChains[k], 'placeFillers' : []}
-  
-          if(chain.placeFillers[position] === undefined)
-            chain.placeFillers[position] = []
+          if(style.spots[position] === undefined)
+            style.spots[position] = []
   
           //push the index of this element onto the list of indices of elements
           //that fill this position in this style chain
-          chain.placeFillers[position].push(j)
+          style.spots[position].push(j)
   
-          styleChains[hash] = chain
+          styles[hash] = style 
         }
       }
     }
   }
-  //to be filled with sets of elements. each set will
-  //get a class assigned to it
+
   var elementSets = []
-  var keys = Object.keys(styleChains)
+  var keys = Object.keys(styles)
   for(var i = 0; i < keys.length; i++){
-    elementSets = elementSets.concat(styleChains[keys[i]].placeFillers)
+    elementSets = elementSets.concat(styles[keys[i]].spots)
   }
 
   //get the classes for each set
@@ -68,11 +66,11 @@ module.exports = function(root, legible){
   var chains = []
   var count = 0
   for(var i = 0; i < keys.length; i++){
-    var style = styleChains[keys[i]]
-    for(var j = 0; j < style.placeFillers.length; j++){
-      style.placeFillers[j] = classes[count++]
+    var style = styles[keys[i]]
+    for(var j = 0; j < style.spots.length; j++){
+      style.spots[j] = classes[count++]
     }
-    chains.push(fillPlaceHolders(styleChains[keys[i]].structure, styleChains[keys[i]].placeFillers))
+    chains.push(fillPlaceHolders(styles[keys[i]].style, styles[keys[i]].spots))
   }
 
   return generateStyleSheet(chains)
