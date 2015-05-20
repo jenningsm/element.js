@@ -73,7 +73,7 @@ module.exports = function(root, legible){
     chains.push(fillPlaceHolders(styles[keys[i]].style, styles[keys[i]].spots))
   }
 
-  return generateStyleSheet(chains)
+  return generateStyleSheet(chains, '', (legible ? '  ' : ''))
 }
 
 function removeDuplicates(array){
@@ -84,9 +84,15 @@ function removeDuplicates(array){
   return Object.keys(table)
 }
 
-function generateStyleSheet(styleChains, indent){
-  if(indent === undefined)
-    indent = ''
+function generateStyleSheet(styleChains, indent, tab){
+
+  var tab, newline
+  if(tab !== ''){
+    newline = '\n'
+  } else {
+    newline = ''
+  }
+
   var tops = {}
   var styleString = ''
   for(var i = 0; i < styleChains.length; i++){
@@ -95,16 +101,16 @@ function generateStyleSheet(styleChains, indent){
   }
   var keys = Object.keys(tops)
   for(var i = 0; i < keys.length; i++){
-    styleString += indent +  keys[i] + ' {\n'
+    styleString += indent +  keys[i] + '{' + newline
     for(var j = 0; j < tops[keys[i]].length; j++){
       var chain = tops[keys[i]][j]
       if(chain.length === 2){
-        styleString += indent + '  ' +  chain[0] + ':' + chain[1] + ';\n'
+        styleString += indent + tab +  chain[0] + ':' + chain[1] + ';' + newline
       } else if(chain.length > 2){
-        styleString += generateStyleSheet([chain], indent + '  ')
+        styleString += generateStyleSheet([chain], indent + tab, tab)
       }
     }
-    styleString += indent + '}\n'
+    styleString += indent + '}' + newline
   }
   return styleString
 }
