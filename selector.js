@@ -69,7 +69,7 @@ Selector.prototype.getPlaceHolderIndex = function(path){
     if(index !== false)
       return index
   
-    for(var i = 0; i < immediateChildren.length; i++){
+    for(var i = 0; i < this.immediateChildren.length; i++){
       var index = this.immediateChildren[i].getPlaceHolderIndex(path)
       if(index !== false)
         return index
