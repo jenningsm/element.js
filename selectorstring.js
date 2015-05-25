@@ -1,63 +1,58 @@
 
 module.exports = SelectorString
-function SelectorString(args){
-   //maps place holder names to their id and positions
-   this.placeHolders = {}
-   this.numPlaceHolders = 0
-   //maps place holder ids to placeholder names
-   this.ids = []
-   //maps positions to ids
-   this.positions = []
-   this.hierarchy = []
+function SelectorString(selectorList){
 
-   var unnamedCount = 0
-   var phID = 0
-   for(var i = 0; i < args.length; i++){
-     var positions = []
-     var split = args[i].split('$')
-     this.hierarchy[i] =  [split[0]]
-     for(var j = 1; j < split.length; j++){
-       var pEnd = split[j].search(/[^a-z]/)
-       if(pEnd === -1)
-         pEnd = split[j].length
-       var placeHolder = split[j].substring(0, pEnd)
-       this.hierarchy[i].push(split[j].substr(pEnd))
-       if(placeHolder === '')
-         placeHolder = unnamedCount++
+  //maps placeholders to their placeholder ids
+  this.placeHolders = {}
+  this.selectorStrings = []
+  this.numPlaceHolders = 0
 
-       if(this.placeHolders[placeHolder] === undefined){
-         this.placeHolders[placeHolder] = {'id' :  phID, 'positions' : []}
-         this.ids[phID] = placeHolder
-         phID++
-       }
+  var numUnnamed = 0
+  for(var i = 0; i < selectorList.length; i++){
+    var places = selectorList[i].split('$')
+    for(var j = 1; j < places.length; j++){
+      var placeHolder
+      var holderEnd = places[j].search(/[^a-z]/)
+      if(holderEnd === -1)
+        holderEnd = places[j].length
 
-       positions.push(this.placeHolders[placeHolder].id)
-       this.placeHolders[placeHolder].positions.push({'level' : i, 'index' : j-1})
-     }
-     this.positions.push(positions)
-   }
-   this.numPlaceHolders = phID
+      if(holderEnd === 0){
+        placeHolder = numUnnamed++
+        places[j] = placeHolder + places[j]
+      } else {
+        placeHolder = places[j].substr(0, holderEnd)  
+      }
+      if(this.placeHolders[placeHolder] === undefined){
+        this.placeHolders[placeHolder] = this.numPlaceHolders++
+      }
+    }
+    this.selectorStrings.push(places.join('$'))
+  }
 
 }
 
 SelectorString.prototype.getPlaceHolderIndex = function(placeholder){
-  if(this.placeHolders[placeholder] === undefined)
+  if(this.placeHolders[placeholder] === undefined){
     return false
+  }
 
-  return this.placeHolders[placeholder].id
+  return this.placeHolders[placeholder]
 }
 
 SelectorString.prototype.getHash = function(base){
   if(base === undefined)
     base = 0
 
-  var hashStructure = []
-  for(var i = 0; i < this.hierarchy.length; i++){
-    var level = this.hierarchy[i][0]
-    for(var j = 0; j < this.positions[i].length; j++){
-      level += '$' + (this.positions[i][j] + base) + this.hierarchy[i][j+1]
+  var ret = []
+
+  for(var j = 0; j < this.selectorStrings.length; j++){
+    var string = this.selectorStrings[j]
+    var keys = Object.keys(this.placeHolders)
+    for(var i = 0; i < keys.length; i++){
+      string = string.replace('$' + keys[i], '$' + (this.placeHolders[keys[i]] + base))
     }
-    hashStructure.push(level)
+    ret.push(string)
   }
-  return hashStructure
+
+  return ret
 }

@@ -4,13 +4,17 @@ var compile = require('./csscompile');
 
 
 module.exports = function(root, legible){
+
+  //hash all identical styles together, keeping track of which
+  //elements occur in which placeholders
+
   var styles = {}
   var iter = root.iterator(), el;
   //for every element
   for(var j = 0; (el = iter()) !== null; j++){
-    //for every selector
+    //for every selector belonging to that element
     for(var i = 0; i < el.selectors.length; i++){
-
+      //if the selector is styled
       if(el.selectors[i].selector.isStyled()){
         var theseStyles = el.selectors[i].selector.getHashes()
   
@@ -35,16 +39,20 @@ module.exports = function(root, legible){
     }
   }
 
+  //group elements by the placeholders they occur in
+  //an element may appear in multiple groups
+
   var elementSets = []
   var keys = Object.keys(styles)
   for(var i = 0; i < keys.length; i++){
     elementSets = elementSets.concat(styles[keys[i]].spots)
   }
 
-  //get the classes for each set
+  //get a class for each group
   var classes = classGen(elementSets)
 
-  //assign the classes to the elements
+  //create mapping from elements to the classes that
+  //should be assigned to them
   var elementsToClasses = []
   for(var i = 0; i < elementSets.length; i++){
     var elements = elementSets[i]
@@ -57,12 +65,14 @@ module.exports = function(root, legible){
       elementsToClasses[element].push(cls)
     }
   }
+  //assign these classes to the elements
   var iter = root.iterator();
   for(var i = 0, el; (el = iter()) !== null; i++){
     if(elementsToClasses[i] !== undefined && elementsToClasses[i].length !== 0)
       el.classes = removeDuplicates(elementsToClasses[i]).join(' ')
   }
 
+  //get the style chains with placeholders replaced by the appropriate classes
   var chains = []
   var count = 0
   for(var i = 0; i < keys.length; i++){
@@ -73,6 +83,7 @@ module.exports = function(root, legible){
     chains.push(fillPlaceHolders(styles[keys[i]].style, styles[keys[i]].spots))
   }
 
+  //generate the style sheet and return it
   return generateStyleSheet(chains, '', (legible ? '  ' : ''))
 }
 
@@ -135,17 +146,5 @@ function fillPlaceHolders(structure, classes){
     structure[i] = split.join('')
   }
   return structure
-}
-
-
-
-function format(string){
-   //remove spaces at beginning
-   string = string.replace(/^\s*/g, '');
-   //remove spaces at end
-   string = string.replace(/\s*$/g, '');
-   //remove repeated spaces
-   string = string.replace(/\s+/g, ' ');
-   return string;
 }
 
