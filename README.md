@@ -12,23 +12,28 @@ your done you cann generate() on that element and get the generated html and css
 Each element object has the following methods:
 
 elem.style(styles) : 
+
   styles : an object literal contaning css styles.
 
   This call applies the styles in styles to elem.
 
 elem.attribute(attrs) :
+
   attrs : an object literal containing html attributes.
 
   This call applies thoseattributes to elem.
 
 elem.content(cont) : 
+
   cont: may be a string, number, or Element object.
 
   This call inserts cont into the element object.
 
 element.generate(sharedVars, legible) : 
+
   sharedVars : an object literal containing any objects to share with the client-side code as described
                below. 
+
   legible    : a boolean dictating whether the generated html and css should be human-readable or 
                minified.
                    
