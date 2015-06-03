@@ -4,14 +4,42 @@ This is a node library I'm developing for generating html and css in javascript.
 still not sure if it's a really good idea, but I've used in two projects so far and have enjoyed it. It's
 also still in development; not all the features are there yet.
 
-The element constructor takes a string as it's argument, which specifies the html tag for that element.
+Here's how it works: For any html element you want to add to your html document, you create an Element
+object. The Element constructor takes as an argument the name of the tag for the html element you want to
+create. You then add whatever content you want to add to that element, including other elements, and once
+your done you cann generate() on that element and get the generated html and css for your page.
 
-The element object has four basic functions:
+Each element object has the following methods:
 
-style(): add a style to this element
-attribute(): add an attribute to this element
-content(): add content to this element. Content may be text or it may be other element objects.
-generate(): Generate the css and html for this element and all its children.
+elem.style(styles) : 
+  styles : an object literal contaning css styles.
 
-I know this documentation is very poor, I'm hoping to flesh it out in the future when its interface is
-finalized.
+  This call applies the styles in styles to elem.
+
+elem.attribute(attrs) :
+  attrs : an object literal containing html attributes.
+
+  This call applies thoseattributes to elem.
+
+elem.content(cont) : 
+  cont: may be a string, number, or Element object.
+
+  This call inserts cont into the element object.
+
+element.generate(sharedVars, legible) : 
+  sharedVars : an object literal containing any objects to share with the client-side code as described
+               below. 
+  legible    : a boolean dictating whether the generated html and css should be human-readable or 
+               minified.
+                   
+  returns the generated css, html, and javascript.
+
+
+
+In addition to generating the html and css for your page, you may also share information with the
+client-side javascript. You can share any object, including Element objects, by including them
+in the sharedVars parameter of the generate function. The sharedVars parameter will be passed to
+the client-side as an object called pbr (I don't know why I chose this name). If you include any
+Element Objects in sharedVars, they will automatically be replaced by functions that return the
+DOM node for that element.
+
