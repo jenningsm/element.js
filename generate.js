@@ -7,8 +7,6 @@ var cssify = require('./cssify.js');
 function generate(shared, legible){
   //the order in which each these calls are made is very important
 
-  applyChildFunctions(this)
-
   var sharedScript = shareVars(shared, this.instance);
   var styles = cssify(this, legible);
 
@@ -34,26 +32,6 @@ function generate(shared, legible){
 
 
 //////////////////////////////////////////////////////////
-
-
-function applyChildFunctions(element){
-  if(typeof element === 'string')
-    return
-
-  for(var i = 0; i < element.contentList.length; i++){
-    element.contentList[i].overwrite = false
-  }
-
-  for(var i = 0; i < element.childFunctions.length; i++){
-    for( var j = 0; j < element.contentList.length; j++){
-      element.childFunctions[i](element.contentList[j], j, element.contentList.length);
-    }
-  }
-
-  for(var i = 0; i < element.contentList.length; i++){
-    applyChildFunctions(element.contentList[i]);
-  }
-}
 
 
 //iterates through element and appends insert at the first

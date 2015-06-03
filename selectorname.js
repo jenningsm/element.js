@@ -9,12 +9,12 @@ module.exports = function(i){
 
   var chars = [];
 
-  chars.push(Math.floor(i % startchars));
+  chars.unshift(Math.floor(i % startchars));
   i /= startchars;
   length--;
 
   while (length > 0){
-    chars.push(Math.floor(i % numchars));
+    chars.unshift(Math.floor(i % numchars));
     i /= numchars;
     length--;
   } 

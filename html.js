@@ -1,4 +1,5 @@
 
+var Selector = require('./selector.js')
 
 /*
   tag: the tag of the element
@@ -8,11 +9,12 @@
 function Element(tag, attributes, value){
 
   this.contentList = [];
-  this.childFunctions = [];
   this.attributes = {};
-  this.styles = {};
   this.flags = {};
   this.overwrite = true
+
+  var sel = new Selector('$')
+  this.selectors = [{'selector' : sel, 'position' : sel.getPlaceHolderIndex([0])}]
 
   if(tag !== undefined){
     this.tag = tag;
@@ -23,6 +25,19 @@ function Element(tag, attributes, value){
   if(attributes !== undefined){
     this.attribute(attributes, value)
   }
+}
+
+Element.prototype.style = function(style){
+  var sel = this.selectors[0]['selector']
+  sel.style.apply(sel, arguments)
+  return this
+}
+
+Element.prototype.assign = function(selector, path){
+  if(selector.getPlaceHolderIndex(path) === false)
+    console.error("bad path: ", path)
+  this.selectors.push({'selector' : selector, 'position' : selector.getPlaceHolderIndex(path)})
+  return this
 }
 
 Element.prototype.share = function(data){
@@ -39,16 +54,8 @@ Element.prototype.capture = function(){
   return this;
 }
 
-Element.prototype.childFunction = function(func){
-  this.childFunctions.push(func);
-  return this;
-}
-
 Element.prototype.iterator = require('./iterator.js');
 
-var sty = require('./styles.js');
-Element.prototype.style = sty.style;
-Element.prototype.pseudoStyle = sty.pseudoStyle;
 
 Element.prototype.attribute = require('./attributes.js');
 
