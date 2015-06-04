@@ -4,16 +4,22 @@ module.exports = generate;
 var shareVars = require('./share.js');
 var cssify = require('./cssify.js');
 
-function generate(shared, legible){
+function generate(shared, legible, compileStyles){
   //the order in which each these calls are made is very important
 
   var sharedScript = shareVars(shared, this.instance);
-  var styles = cssify(this, legible);
+  var styles
 
-  var embeddedCSS = new this.constructor('style').content(styles);
+  if(compileStyles !== false){
+    styles = cssify(this, legible)
+    var embeddedCSS = new this.constructor('style').content(styles);
+    styles = (appendAt(this, 'embedCSS', embeddedCSS) ? null : styles)
+  } else {
+    styles = null
+  }
+
   var embeddedJS = new this.constructor('script').content(sharedScript);
 
-  styles = (appendAt(this, 'embedCSS', embeddedCSS) ? null : styles)
   sharedScript = (appendAt(this, 'embedJS', embeddedJS) ? null : sharedScript)
 
   var html = toHTML(this, '', legible !== true ? '' : '  ');
