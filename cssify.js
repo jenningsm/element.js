@@ -68,8 +68,14 @@ module.exports = function(root, legible){
   //assign these classes to the elements
   var iter = root.iterator();
   for(var i = 0, el; (el = iter()) !== null; i++){
-    if(elementsToClasses[i] !== undefined && elementsToClasses[i].length !== 0)
-      el.classes = removeDuplicates(elementsToClasses[i]).join(' ')
+    if(elementsToClasses[i] !== undefined && elementsToClasses[i].length !== 0){
+      if(el.attributes['class'] === undefined) {
+        el.attributes['class'] = ''
+      } else {
+        el.attributes['class'] = el.attributes['class'] + ' '
+      }
+      el.classes = el.attributes['class'] + removeDuplicates(elementsToClasses[i]).join(' ')
+    }
   }
 
   //get the style chains with placeholders replaced by the appropriate classes
