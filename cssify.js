@@ -3,37 +3,44 @@ var classGen = require('./classes.js')
 var compile = require('./csscompile');
 
 
-module.exports = function(root, legible){
+module.exports = function(roots, legible){
+
+  if(!Array.isArray(roots)){
+    roots = [roots]
+  }
 
   //hash all identical styles together, keeping track of which
   //elements occur in which placeholders
 
   var styles = {}
-  var iter = root.iterator(), el;
-  //for every element
-  for(var j = 0; (el = iter()) !== null; j++){
-    //for every selector belonging to that element
-    for(var i = 0; i < el.selectors.length; i++){
-      //if the selector is styled
-      if(el.selectors[i].selector.isStyled()){
-        var theseStyles = el.selectors[i].selector.getHashes()
-  
-        //for every style
-        for(var k = 0; k < theseStyles.length; k++){
-          var hash = theseStyles[k].join('?')
-          var style = styles[hash]
-          if(style === undefined)
-            style = {'style' : theseStyles[k], 'spots' : []}
-  
-          var position = el.selectors[i].position
-          if(style.spots[position] === undefined)
-            style.spots[position] = []
-  
-          //push the index of this element onto the list of indices of elements
-          //that fill this position in this style chain
-          style.spots[position].push(j)
-  
-          styles[hash] = style 
+  for(var l = 0; l < roots.length; l++){
+    root = roots[l]
+    var iter = root.iterator(), el;
+    //for every element
+    for(var j = 0; (el = iter()) !== null; j++){
+      //for every selector belonging to that element
+      for(var i = 0; i < el.selectors.length; i++){
+        //if the selector is styled
+        if(el.selectors[i].selector.isStyled()){
+          var theseStyles = el.selectors[i].selector.getHashes()
+    
+          //for every style
+          for(var k = 0; k < theseStyles.length; k++){
+            var hash = theseStyles[k].join('?')
+            var style = styles[hash]
+            if(style === undefined)
+              style = {'style' : theseStyles[k], 'spots' : []}
+    
+            var position = el.selectors[i].position
+            if(style.spots[position] === undefined)
+              style.spots[position] = []
+    
+            //push the index of this element onto the list of indices of elements
+            //that fill this position in this style chain
+            style.spots[position].push([l,j].join('?'))
+    
+            styles[hash] = style 
+          }
         }
       }
     }
@@ -66,15 +73,19 @@ module.exports = function(root, legible){
     }
   }
   //assign these classes to the elements
-  var iter = root.iterator();
-  for(var i = 0, el; (el = iter()) !== null; i++){
-    if(elementsToClasses[i] !== undefined && elementsToClasses[i].length !== 0){
-      if(el.attributes['class'] === undefined) {
-        el.attributes['class'] = ''
-      } else {
-        el.attributes['class'] = el.attributes['class'] + ' '
+  for(var k = 0; k < roots.length; k++){
+    var root = roots[k]
+    var iter = root.iterator();
+    for(var i = 0, el; (el = iter()) !== null; i++){
+      var index = k + '?' + i
+      if(elementsToClasses[index] !== undefined && elementsToClasses[index].length !== 0){
+        if(el.attributes['class'] === undefined) {
+          el.attributes['class'] = ''
+        } else {
+          el.attributes['class'] = el.attributes['class'] + ' '
+        }
+        el.classes = el.attributes['class'] + removeDuplicates(elementsToClasses[index]).join(' ')
       }
-      el.classes = el.attributes['class'] + removeDuplicates(elementsToClasses[i]).join(' ')
     }
   }
 

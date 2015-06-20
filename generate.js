@@ -1,22 +1,18 @@
 
-module.exports = generate;
+module.exports.generate = generate;
+module.exports.generateNoCSS = generateNoCSS;
 
 var shareVars = require('./share.js');
 var cssify = require('./cssify.js');
 
-function generate(shared, legible, compileStyles){
+function generate(shared, legible){
   //the order in which each these calls are made is very important
 
   var sharedScript = shareVars(shared, this.instance);
-  var styles
 
-  if(compileStyles !== false){
-    styles = cssify(this, legible)
-    var embeddedCSS = new this.constructor('style').content(styles);
-    styles = (appendAt(this, 'embedCSS', embeddedCSS) ? null : styles)
-  } else {
-    styles = null
-  }
+  var styles = cssify(this, legible)
+  var embeddedCSS = new this.constructor('style').content(styles);
+  styles = (appendAt(this, 'embedCSS', embeddedCSS) ? null : styles)
 
   var embeddedJS = new this.constructor('script').content(sharedScript);
 
@@ -35,6 +31,22 @@ function generate(shared, legible, compileStyles){
   return ret
 }
 
+function generateNoCSS(shared, legible){
+  //the order in which each these calls are made is very important
+
+  var sharedScript = shareVars(shared, this.instance);
+  var embeddedJS = new this.constructor('script').content(sharedScript);
+  sharedScript = (appendAt(this, 'embedJS', embeddedJS) ? null : sharedScript)
+
+  var html = toHTML(this, '', legible !== true ? '' : '  ');
+
+  var ret = {'html' : html};
+  if(sharedScript !== null){
+    ret.js = sharedScript;
+  }
+
+  return ret
+}
 
 
 //////////////////////////////////////////////////////////
@@ -75,7 +87,10 @@ function toHTML(element, indent, tab){
     }
     var akeys = Object.keys(element.attributes);
     for(var i = 0; i < akeys.length; i++){
-      open += " " + akeys[i] + '="' + element.attributes[akeys[i]] + '"';
+      open += " " + akeys[i]
+      if(element.attributes[akeys[i]] !== undefined){
+        open += '="' + element.attributes[akeys[i]] + '"'
+      }
     }
     if(selfClosing){
       open += '/';

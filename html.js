@@ -1,4 +1,5 @@
 
+var cssify = require('./cssify.js')
 var Selector = require('./selector.js')
 
 /*
@@ -25,6 +26,20 @@ function Element(tag, attributes, value){
   if(attributes !== undefined){
     this.attribute(attributes, value)
   }
+}
+
+Element.generate = function(roots, shared, legible){
+  var stylesheet = cssify(roots, legible)
+
+  var ret = { css : stylesheet, html : {} , js : {} }
+
+  for(var i = 0; i < roots.length; i++){
+    var gen = roots[i].generateNoCSS(shared[i] === undefined ? {} : shared[i], legible)
+    ret.html[i] = gen.html
+    ret.js[i] = gen.js
+  }
+
+  return ret
 }
 
 Element.prototype.style = function(style){
@@ -65,6 +80,7 @@ Element.prototype.embedCSS = embed.embedCSS;
 
 Element.prototype.content = require('./content.js');
 
-Element.prototype.generate = require('./generate.js');
+Element.prototype.generate = require('./generate.js').generate;
+Element.prototype.generateNoCSS = require('./generate.js').generateNoCSS;
 
 module.exports = Element;
